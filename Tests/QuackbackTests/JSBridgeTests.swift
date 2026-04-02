@@ -5,19 +5,27 @@ final class JSBridgeTests: XCTestCase {
     func testInitCommand() {
         let config = QuackbackConfig(appId: "app1", baseURL: URL(string: "https://x.com")!, theme: .dark, locale: "fr")
         let js = JSBridge.initCommand(config: config)
-        XCTAssertTrue(js.contains("Quackback('init'")); XCTAssertTrue(js.contains("\"appId\":\"app1\""))
+        XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:init"))
+        XCTAssertTrue(js.contains("\"appId\":\"app1\""))
         XCTAssertTrue(js.contains("\"theme\":\"dark\"")); XCTAssertTrue(js.contains("\"locale\":\"fr\""))
     }
     func testIdentifySSO() {
-        XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "tok123").contains("\"ssoToken\":\"tok123\""))
+        let js = JSBridge.identifyCommand(ssoToken: "tok123")
+        XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:identify"))
+        XCTAssertTrue(js.contains("\"ssoToken\":\"tok123\""))
     }
     func testIdentifyAttrs() {
         let js = JSBridge.identifyCommand(userId: "u1", email: "a@b.c", name: "A", avatarURL: nil)
+        XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:identify"))
         XCTAssertTrue(js.contains("\"id\":\"u1\"")); XCTAssertTrue(js.contains("\"email\":\"a@b.c\""))
     }
-    func testOpenBoard() { XCTAssertTrue(JSBridge.openCommand(board: "bugs").contains("\"board\":\"bugs\"")) }
-    func testOpenNil() { XCTAssertEqual(JSBridge.openCommand(board: nil), "Quackback('open');") }
-    func testLogout() { XCTAssertEqual(JSBridge.logoutCommand(), "Quackback('logout');") }
+    func testOpenBoard() {
+        let js = JSBridge.openCommand(board: "bugs")
+        XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:open"))
+        XCTAssertTrue(js.contains("\"board\":\"bugs\""))
+    }
+    func testOpenNil() { XCTAssertEqual(JSBridge.openCommand(board: nil), "window.postMessage({type:'quackback:open'},'*');") }
+    func testLogout() { XCTAssertEqual(JSBridge.logoutCommand(), "window.postMessage({type:'quackback:identify',data:null},'*');") }
     func testParseVoteEvent() {
         let json = #"{"event":"vote","data":{"type":"quackback:event","name":"vote","payload":{"postId":"post_abc"}}}"#
         let p = JSBridge.parseEvent(json)!
@@ -101,11 +109,11 @@ final class JSBridgeTests: XCTestCase {
         XCTAssertTrue(JSBridge.logoutCommand().hasSuffix(";"))
     }
 
-    func testCommandsStartWithQuackback() {
+    func testCommandsStartWithPostMessage() {
         let config = QuackbackConfig(appId: "x", baseURL: URL(string: "https://x.com")!)
-        XCTAssertTrue(JSBridge.initCommand(config: config).hasPrefix("Quackback("))
-        XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "t").hasPrefix("Quackback("))
-        XCTAssertTrue(JSBridge.openCommand(board: nil).hasPrefix("Quackback("))
-        XCTAssertTrue(JSBridge.logoutCommand().hasPrefix("Quackback("))
+        XCTAssertTrue(JSBridge.initCommand(config: config).contains("window.postMessage"))
+        XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "t").contains("window.postMessage"))
+        XCTAssertTrue(JSBridge.openCommand(board: nil).contains("window.postMessage"))
+        XCTAssertTrue(JSBridge.logoutCommand().contains("window.postMessage"))
     }
 }
