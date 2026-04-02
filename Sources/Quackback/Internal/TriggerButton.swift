@@ -5,16 +5,47 @@ final class TriggerButton: UIButton {
     private let position: QuackbackPosition
     private var isOpen = false
     private let size: CGFloat = 48
-    private let inset: CGFloat = 16
+    private let inset: CGFloat = 24
+    private let iconSize: CGFloat = 28
+
+    private let chatIcon = UIImageView()
+    private let closeIcon = UIImageView()
 
     init(position: QuackbackPosition, color: UIColor) {
         self.position = position; super.init(frame: .zero)
         backgroundColor = color; layer.cornerRadius = size / 2
-        layer.shadowColor = UIColor.black.cgColor; layer.shadowOffset = CGSize(width: 0, height: 2)
-        layer.shadowOpacity = 0.25; layer.shadowRadius = 4
+        layer.shadowColor = UIColor.black.cgColor; layer.shadowOffset = CGSize(width: 0, height: 4)
+        layer.shadowOpacity = 0.15; layer.shadowRadius = 6
         translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([widthAnchor.constraint(equalToConstant: size), heightAnchor.constraint(equalToConstant: size)])
-        updateIcon(animated: false)
+
+        let chatImage = UIImage(systemName: "bubble.left.fill")?
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 20, weight: .medium))
+            .withTintColor(.white, renderingMode: .alwaysOriginal)
+        chatIcon.image = chatImage
+        chatIcon.contentMode = .scaleAspectFit
+        chatIcon.translatesAutoresizingMaskIntoConstraints = false
+        chatIcon.alpha = 1
+        addSubview(chatIcon)
+
+        let closeImage = UIImage(systemName: "xmark")?
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 20, weight: .bold))
+            .withTintColor(.white, renderingMode: .alwaysOriginal)
+        closeIcon.image = closeImage
+        closeIcon.contentMode = .scaleAspectFit
+        closeIcon.translatesAutoresizingMaskIntoConstraints = false
+        closeIcon.alpha = 0
+        closeIcon.transform = CGAffineTransform(rotationAngle: -.pi / 2)
+        addSubview(closeIcon)
+
+        for icon in [chatIcon, closeIcon] {
+            NSLayoutConstraint.activate([
+                icon.centerXAnchor.constraint(equalTo: centerXAnchor),
+                icon.centerYAnchor.constraint(equalTo: centerYAnchor),
+                icon.widthAnchor.constraint(equalToConstant: iconSize),
+                icon.heightAnchor.constraint(equalToConstant: iconSize),
+            ])
+        }
     }
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
 
@@ -30,16 +61,40 @@ final class TriggerButton: UIButton {
     }
 
     func setOpen(_ open: Bool) {
-        guard open != isOpen else { return }; isOpen = open; updateIcon(animated: true)
+        guard open != isOpen else { return }; isOpen = open
+        let duration: TimeInterval = 0.22
+        let damping: CGFloat = 0.65
+
+        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: damping, initialSpringVelocity: 0, options: []) {
+            if open {
+                self.chatIcon.alpha = 0
+                self.chatIcon.transform = CGAffineTransform(rotationAngle: .pi / 2)
+                self.closeIcon.alpha = 1
+                self.closeIcon.transform = .identity
+            } else {
+                self.chatIcon.alpha = 1
+                self.chatIcon.transform = .identity
+                self.closeIcon.alpha = 0
+                self.closeIcon.transform = CGAffineTransform(rotationAngle: -.pi / 2)
+            }
+        }
     }
 
-    private func updateIcon(animated: Bool) {
-        let name = isOpen ? "xmark" : "bubble.left.fill"
-        let img = UIImage(systemName: name)?
-            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 20, weight: .medium))
-            .withTintColor(.white, renderingMode: .alwaysOriginal)
-        if animated { UIView.transition(with: self, duration: 0.25, options: .transitionCrossDissolve) { self.setImage(img, for: .normal) } }
-        else { setImage(img, for: .normal) }
+    // MARK: - Touch feedback
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        UIView.animate(withDuration: 0.1) { self.transform = CGAffineTransform(scaleX: 1.1, y: 1.1) }
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        UIView.animate(withDuration: 0.1) { self.transform = .identity }
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        UIView.animate(withDuration: 0.1) { self.transform = .identity }
     }
 }
 #endif

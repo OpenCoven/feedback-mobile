@@ -9,8 +9,12 @@ public enum Quackback {
     private static let emitter = EventEmitter()
     private static var isShowing = false
     private static var pendingIdentify: String?
+    private static var serverThemeColor: UIColor?
 
-    public static func configure(_ config: QuackbackConfig) { self.config = config }
+    public static func configure(_ config: QuackbackConfig) {
+        self.config = config
+        fetchTheme(baseURL: config.baseURL)
+    }
 
     public static func identify(ssoToken: String) { enqueue(JSBridge.identifyCommand(ssoToken: ssoToken)) }
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {
@@ -26,7 +30,7 @@ public enum Quackback {
 
     public static func showTrigger() {
         guard let config, trigger == nil else { return }
-        let color = parseHex(config.buttonColor) ?? .systemBlue
+        let color = resolveColor(config: config)
         let btn = TriggerButton(position: config.position, color: color)
         btn.addTarget(self, action: #selector(triggerTapped), for: .touchUpInside)
         if let w = keyWindow { btn.install(in: w) }; trigger = btn
@@ -41,7 +45,32 @@ public enum Quackback {
 
     public static func destroy() {
         dismissPanel(); hideTrigger(); wvManager?.tearDown(); wvManager = nil
-        emitter.removeAll(); config = nil; pendingIdentify = nil
+        emitter.removeAll(); config = nil; pendingIdentify = nil; serverThemeColor = nil
+    }
+
+    // MARK: - Private
+
+    private static let defaultColor = UIColor(red: 99/255, green: 102/255, blue: 241/255, alpha: 1)
+
+    private static func resolveColor(config: QuackbackConfig) -> UIColor {
+        if let custom = parseHex(config.buttonColor) { return custom }
+        return serverThemeColor ?? defaultColor
+    }
+
+    private static func fetchTheme(baseURL: String) {
+        guard let url = URL(string: "\(baseURL)/api/widget/config.json") else { return }
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let theme = json["theme"] as? [String: Any] else { return }
+
+            let hex = theme["lightPrimary"] as? String
+            guard let color = parseHex(hex) else { return }
+            DispatchQueue.main.async {
+                serverThemeColor = color
+                trigger?.backgroundColor = color
+            }
+        }.resume()
     }
 
     private static func ensureWV(_ config: QuackbackConfig) {
