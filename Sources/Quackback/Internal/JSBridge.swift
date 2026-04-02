@@ -6,26 +6,26 @@ enum JSBridge {
     static func initCommand(config: QuackbackConfig) -> String {
         var p: [String: String] = ["appId": config.appId, "theme": config.theme.rawValue]
         if let l = config.locale { p["locale"] = l }
-        return "Quackback('init', \(json(p)));"
+        return "window.postMessage({type:'quackback:init',data:\(json(p))},'*');"
     }
 
     static func identifyCommand(ssoToken: String) -> String {
-        "Quackback('identify', \(json(["ssoToken": ssoToken])));"
+        "window.postMessage({type:'quackback:identify',data:\(json(["ssoToken": ssoToken]))},'*');"
     }
 
     static func identifyCommand(userId: String, email: String, name: String?, avatarURL: String?) -> String {
         var p: [String: String] = ["id": userId, "email": email]
         if let n = name { p["name"] = n }
         if let a = avatarURL { p["avatarURL"] = a }
-        return "Quackback('identify', \(json(p)));"
+        return "window.postMessage({type:'quackback:identify',data:\(json(p))},'*');"
     }
 
     static func openCommand(board: String?) -> String {
-        guard let b = board else { return "Quackback('open');" }
-        return "Quackback('open', \(json(["board": b])));"
+        guard let b = board else { return "window.postMessage({type:'quackback:open'},'*');" }
+        return "window.postMessage({type:'quackback:open',data:\(json(["board": b]))},'*');"
     }
 
-    static func logoutCommand() -> String { "Quackback('logout');" }
+    static func logoutCommand() -> String { "window.postMessage({type:'quackback:identify',data:null},'*');" }
 
     static func parseEvent(_ jsonString: String) -> ParsedEvent? {
         guard let data = jsonString.data(using: .utf8),
