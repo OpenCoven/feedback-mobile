@@ -45,6 +45,7 @@ final class QuackbackWebView: NSObject, WKScriptMessageHandler, WKNavigationDele
         if parsed.event == .ready {
             isReady = true
             webView?.evaluateJavaScript(JSBridge.initCommand(config: config))
+            if let l = config.locale { webView?.evaluateJavaScript(JSBridge.localeCommand(l)) }
             pendingCommands.forEach { webView?.evaluateJavaScript($0) }; pendingCommands.removeAll()
             delegate?.webViewDidBecomeReady(); return
         }

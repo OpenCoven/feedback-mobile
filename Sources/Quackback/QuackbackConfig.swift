@@ -33,6 +33,9 @@ public struct QuackbackConfig: Sendable {
             URLQueryItem(name: "source", value: "native"),
             URLQueryItem(name: "platform", value: "ios"),
         ]
+        if let locale = locale {
+            c.queryItems?.append(URLQueryItem(name: "locale", value: locale))
+        }
         return c.url!
     }
 }

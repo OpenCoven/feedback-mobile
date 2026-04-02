@@ -9,6 +9,10 @@ enum JSBridge {
         return "window.postMessage({type:'quackback:init',data:\(json(p))},'*');"
     }
 
+    static func localeCommand(_ locale: String) -> String {
+        "window.postMessage({type:'quackback:locale',data:'\(locale)'},'*');"
+    }
+
     static func identifyCommand(ssoToken: String) -> String {
         "window.postMessage({type:'quackback:identify',data:\(json(["ssoToken": ssoToken]))},'*');"
     }
