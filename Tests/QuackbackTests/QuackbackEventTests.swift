@@ -32,4 +32,58 @@ final class QuackbackEventTests: XCTestCase {
         emitter.removeAll()
         emitter.emit(.vote, data: [:]); XCTAssertEqual(count, 2)
     }
+
+    func testMultipleListenersSameEvent() {
+        let emitter = EventEmitter()
+        var count1 = 0, count2 = 0
+        emitter.on(.vote) { _ in count1 += 1 }
+        emitter.on(.vote) { _ in count2 += 1 }
+        emitter.emit(.vote, data: [:])
+        XCTAssertEqual(count1, 1)
+        XCTAssertEqual(count2, 1)
+    }
+
+    func testOffWithNonExistentToken() {
+        let emitter = EventEmitter()
+        var count = 0
+        emitter.on(.vote) { _ in count += 1 }
+        emitter.off(EventToken()) // non-existent token
+        emitter.emit(.vote, data: [:])
+        XCTAssertEqual(count, 1) // listener still fires
+    }
+
+    func testEmitWithNoListeners() {
+        let emitter = EventEmitter()
+        // should not crash
+        emitter.emit(.vote, data: ["key": "value"])
+    }
+
+    func testRemoveOnlyTargetListener() {
+        let emitter = EventEmitter()
+        var count1 = 0, count2 = 0
+        emitter.on(.vote) { _ in count1 += 1 }
+        let token2 = emitter.on(.vote) { _ in count2 += 1 }
+        emitter.off(token2)
+        emitter.emit(.vote, data: [:])
+        XCTAssertEqual(count1, 1)
+        XCTAssertEqual(count2, 0)
+    }
+
+    func testAllEventTypes() {
+        let emitter = EventEmitter()
+        var received: [QuackbackEvent] = []
+        for event in [QuackbackEvent.ready, .vote, .submit, .close, .navigate] {
+            emitter.on(event) { _ in received.append(event) }
+            emitter.emit(event, data: [:])
+        }
+        XCTAssertEqual(received, [.ready, .vote, .submit, .close, .navigate])
+    }
+
+    func testEventRawValues() {
+        XCTAssertEqual(QuackbackEvent.ready.rawValue, "ready")
+        XCTAssertEqual(QuackbackEvent.vote.rawValue, "vote")
+        XCTAssertEqual(QuackbackEvent.submit.rawValue, "submit")
+        XCTAssertEqual(QuackbackEvent.close.rawValue, "close")
+        XCTAssertEqual(QuackbackEvent.navigate.rawValue, "navigate")
+    }
 }
