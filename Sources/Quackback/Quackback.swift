@@ -20,6 +20,7 @@ public enum Quackback {
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {
         enqueue(JSBridge.identifyCommand(userId: userId, email: email, name: name, avatarURL: avatarURL))
     }
+    public static func identifyAnonymous() { enqueue(JSBridge.identifyAnonymousCommand()) }
     public static func logout() { enqueue(JSBridge.logoutCommand()) }
 
     public static func open(board: String? = nil) {
@@ -124,6 +125,7 @@ public enum Quackback {
     public static func configure(_ config: QuackbackConfig) { self.config = config }
     public static func identify(ssoToken: String) {}
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {}
+    public static func identifyAnonymous() {}
     public static func logout() {}
     public static func open(board: String? = nil) {}
     public static func close() {}

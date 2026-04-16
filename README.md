@@ -39,20 +39,27 @@ Quackback.configure(QuackbackConfig(
     baseURL: URL(string: "https://feedback.yourapp.com")!
 ))
 
-// 2. Identify the current user (optional)
+// 2. Identify the current user
 Quackback.identify(userId: "user_123", email: "user@example.com", name: "Jane Smith")
+// or, with a server-signed token (recommended for production):
+Quackback.identify(ssoToken: fetchedSsoToken)
+// or, for unauthenticated visitors:
+Quackback.identifyAnonymous()
 
 // 3. Show the floating trigger button
 Quackback.showTrigger()
 ```
+
+Turn on **Verified identity only** in **Admin → Settings → Widget** to require `ssoToken` for every identified user. See the [Identify users guide](https://quackback.io/docs/widget/identify-users) for JWT claims and server examples.
 
 ## API
 
 | Method | Description |
 |--------|-------------|
 | `Quackback.configure(_ config: QuackbackConfig)` | Set up the SDK. Call once at app launch before any other method. |
-| `Quackback.identify(userId:email:name:avatarURL:)` | Associate the current user with feedback. |
-| `Quackback.identify(ssoToken:)` | Identify using a server-issued SSO token. |
+| `Quackback.identify(userId:email:name:avatarURL:)` | Identify the current user with their details. Simplest option, works out of the box. |
+| `Quackback.identify(ssoToken:)` | Identify the current user with a server-signed JWT. Blocks impersonation. |
+| `Quackback.identifyAnonymous()` | Start an anonymous session. The widget prompts for an email inline the first time the user posts. |
 | `Quackback.logout()` | Clear the current user identity. |
 | `Quackback.open(board:)` | Open the feedback panel, optionally on a specific board slug. |
 | `Quackback.close()` | Dismiss the feedback panel. |

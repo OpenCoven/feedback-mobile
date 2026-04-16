@@ -24,6 +24,10 @@ enum JSBridge {
         return "window.postMessage({type:'quackback:identify',data:\(json(p))},'*');"
     }
 
+    static func identifyAnonymousCommand() -> String {
+        "window.postMessage({type:'quackback:identify',data:{\"anonymous\":true}},'*');"
+    }
+
     static func openCommand(board: String?) -> String {
         guard let b = board else { return "window.postMessage({type:'quackback:open'},'*');" }
         return "window.postMessage({type:'quackback:open',data:\(json(["board": b]))},'*');"

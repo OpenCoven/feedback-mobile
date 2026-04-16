@@ -19,6 +19,11 @@ final class JSBridgeTests: XCTestCase {
         XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:identify"))
         XCTAssertTrue(js.contains("\"id\":\"u1\"")); XCTAssertTrue(js.contains("\"email\":\"a@b.c\""))
     }
+    func testIdentifyAnonymous() {
+        let js = JSBridge.identifyAnonymousCommand()
+        XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:identify"))
+        XCTAssertTrue(js.contains("\"anonymous\":true"))
+    }
     func testOpenBoard() {
         let js = JSBridge.openCommand(board: "bugs")
         XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:open"))
@@ -104,6 +109,7 @@ final class JSBridgeTests: XCTestCase {
         XCTAssertTrue(JSBridge.initCommand(config: config).hasSuffix(";"))
         XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "t").hasSuffix(";"))
         XCTAssertTrue(JSBridge.identifyCommand(userId: "u", email: "e", name: nil, avatarURL: nil).hasSuffix(";"))
+        XCTAssertTrue(JSBridge.identifyAnonymousCommand().hasSuffix(";"))
         XCTAssertTrue(JSBridge.openCommand(board: "b").hasSuffix(";"))
         XCTAssertTrue(JSBridge.openCommand(board: nil).hasSuffix(";"))
         XCTAssertTrue(JSBridge.logoutCommand().hasSuffix(";"))
@@ -113,6 +119,7 @@ final class JSBridgeTests: XCTestCase {
         let config = QuackbackConfig(appId: "x", baseURL: URL(string: "https://x.com")!)
         XCTAssertTrue(JSBridge.initCommand(config: config).contains("window.postMessage"))
         XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "t").contains("window.postMessage"))
+        XCTAssertTrue(JSBridge.identifyAnonymousCommand().contains("window.postMessage"))
         XCTAssertTrue(JSBridge.openCommand(board: nil).contains("window.postMessage"))
         XCTAssertTrue(JSBridge.logoutCommand().contains("window.postMessage"))
     }
