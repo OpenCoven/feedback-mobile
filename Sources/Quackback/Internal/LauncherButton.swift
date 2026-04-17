@@ -1,7 +1,7 @@
 #if canImport(UIKit)
 import UIKit
 
-final class TriggerButton: UIButton {
+final class LauncherButton: UIButton {
     private let position: QuackbackPosition
     private var isOpen = false
     private let size: CGFloat = 48

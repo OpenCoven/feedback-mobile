@@ -1,6 +1,6 @@
 # Quackback iOS SDK
 
-Embed the [Quackback](https://quackback.io) feedback widget in your iOS app with a single floating trigger button or programmatic open/close.
+Embed the [Quackback](https://quackback.io) feedback widget in your iOS app with a single floating launcher button or programmatic open/close.
 
 ## Requirements
 
@@ -46,8 +46,8 @@ Quackback.identify(ssoToken: fetchedSsoToken)
 // or, for unauthenticated visitors:
 Quackback.identify()
 
-// 3. Show the floating trigger button
-Quackback.showTrigger()
+// 3. Show the floating launcher button
+Quackback.showLauncher()
 
 // 4. On logout
 Quackback.logout()
@@ -76,11 +76,11 @@ Quackback.configure(config, identity: .ssoToken("jwt..."))
 ```
 | `Quackback.open(board:)` | Open the feedback panel, optionally on a specific board slug. |
 | `Quackback.close()` | Dismiss the feedback panel. |
-| `Quackback.showTrigger()` | Add the floating trigger button to the key window. |
-| `Quackback.hideTrigger()` | Remove the floating trigger button. |
+| `Quackback.showLauncher()` | Add the floating launcher button to the key window. |
+| `Quackback.hideLauncher()` | Remove the floating launcher button. |
 | `Quackback.on(_:handler:) -> EventToken` | Subscribe to a widget event. Returns a token for removal. |
 | `Quackback.off(_ token: EventToken)` | Unsubscribe a previously registered listener. |
-| `Quackback.destroy()` | Tear down the SDK entirely (removes WebView, trigger, and all listeners). |
+| `Quackback.destroy()` | Tear down the SDK entirely (removes WebView, launcher, and all listeners). |
 
 ### QuackbackConfig
 

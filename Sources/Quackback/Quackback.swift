@@ -4,7 +4,7 @@ import UIKit
 public enum Quackback {
     private static var config: QuackbackConfig?
     private static var wvManager: QuackbackWebView?
-    private static var trigger: TriggerButton?
+    private static var launcher: LauncherButton?
     private static var panel: PanelController?
     private static let emitter = EventEmitter()
     private static var isShowing = false
@@ -38,14 +38,14 @@ public enum Quackback {
     }
     public static func close() { dismissPanel() }
 
-    public static func showTrigger() {
-        guard let config, trigger == nil else { return }
+    public static func showLauncher() {
+        guard let config, launcher == nil else { return }
         let color = resolveColor(config: config)
-        let btn = TriggerButton(position: config.position, color: color)
-        btn.addTarget(self, action: #selector(triggerTapped), for: .touchUpInside)
-        if let w = keyWindow { btn.install(in: w) }; trigger = btn
+        let btn = LauncherButton(position: config.position, color: color)
+        btn.addTarget(self, action: #selector(launcherTapped), for: .touchUpInside)
+        if let w = keyWindow { btn.install(in: w) }; launcher = btn
     }
-    public static func hideTrigger() { trigger?.removeFromSuperview(); trigger = nil }
+    public static func hideLauncher() { launcher?.removeFromSuperview(); launcher = nil }
 
     @discardableResult
     public static func on(_ event: QuackbackEvent, handler: @escaping @Sendable ([String: Any]) -> Void) -> EventToken {
@@ -54,7 +54,7 @@ public enum Quackback {
     public static func off(_ token: EventToken) { emitter.off(token) }
 
     public static func destroy() {
-        dismissPanel(); hideTrigger(); wvManager?.tearDown(); wvManager = nil
+        dismissPanel(); hideLauncher(); wvManager?.tearDown(); wvManager = nil
         emitter.removeAll(); config = nil; pendingIdentify = nil; serverThemeColor = nil
     }
 
@@ -78,7 +78,7 @@ public enum Quackback {
             guard let color = parseHex(hex) else { return }
             DispatchQueue.main.async {
                 serverThemeColor = color
-                trigger?.backgroundColor = color
+                launcher?.backgroundColor = color
             }
         }.resume()
     }
@@ -93,14 +93,14 @@ public enum Quackback {
     private static func presentPanel() {
         guard !isShowing, let wvManager else { return }
         let pc = PanelController(webViewManager: wvManager)
-        pc.onDismiss = { isShowing = false; trigger?.setOpen(false) }
+        pc.onDismiss = { isShowing = false; launcher?.setOpen(false) }
         guard let top = topVC else { return }
-        top.present(pc, animated: true); isShowing = true; trigger?.setOpen(true); panel = pc
+        top.present(pc, animated: true); isShowing = true; launcher?.setOpen(true); panel = pc
     }
     private static func dismissPanel() {
-        panel?.dismiss(animated: true); panel = nil; isShowing = false; trigger?.setOpen(false)
+        panel?.dismiss(animated: true); panel = nil; isShowing = false; launcher?.setOpen(false)
     }
-    @objc private static func triggerTapped() { isShowing ? close() : open() }
+    @objc private static func launcherTapped() { isShowing ? close() : open() }
 
     private static var keyWindow: UIWindow? {
         UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).first { $0.isKeyWindow }
@@ -138,8 +138,8 @@ public enum Quackback {
     public static func logout() {}
     public static func open(board: String? = nil) {}
     public static func close() {}
-    public static func showTrigger() {}
-    public static func hideTrigger() {}
+    public static func showLauncher() {}
+    public static func hideLauncher() {}
     @discardableResult
     public static func on(_ event: QuackbackEvent, handler: @escaping @Sendable ([String: Any]) -> Void) -> EventToken {
         emitter.on(event, handler: handler)
