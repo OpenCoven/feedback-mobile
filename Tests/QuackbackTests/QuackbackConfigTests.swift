@@ -6,7 +6,6 @@ final class QuackbackConfigTests: XCTestCase {
         let c = QuackbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
         XCTAssertEqual(c.theme, .system)
         XCTAssertEqual(c.placement, .bottomRight)
-        XCTAssertNil(c.buttonColor)
         XCTAssertNil(c.locale)
     }
 
@@ -22,11 +21,10 @@ final class QuackbackConfigTests: XCTestCase {
     func testCustomValues() {
         let c = QuackbackConfig(
             instanceUrl: URL(string: "https://fb.example.com")!,
-            theme: .dark, placement: .bottomLeft, buttonColor: "#FF0000", locale: "fr"
+            theme: .dark, placement: .bottomLeft, locale: "fr"
         )
         XCTAssertEqual(c.theme, .dark)
         XCTAssertEqual(c.placement, .bottomLeft)
-        XCTAssertEqual(c.buttonColor, "#FF0000")
         XCTAssertEqual(c.locale, "fr")
     }
 

@@ -71,7 +71,6 @@ public enum Quackback {
     private static let defaultColor = UIColor(red: 99/255, green: 102/255, blue: 241/255, alpha: 1)
 
     private static func resolveColor(config: QuackbackConfig) -> UIColor {
-        if let custom = parseHex(config.buttonColor) { return custom }
         return serverThemeColor ?? defaultColor
     }
 

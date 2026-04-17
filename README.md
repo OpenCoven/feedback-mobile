@@ -89,7 +89,6 @@ QuackbackConfig(
     instanceUrl: URL,                                  // required — your Quackback instance URL
     theme: QuackbackTheme = .system,              // .light | .dark | .system
     placement: QuackbackPosition = .bottomRight,  // .bottomRight | .bottomLeft
-    buttonColor: String? = nil,                   // hex color e.g. "#6366F1"
     locale: String? = nil                         // BCP-47 locale e.g. "fr", "de"
 )
 ```

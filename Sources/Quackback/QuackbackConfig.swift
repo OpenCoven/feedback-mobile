@@ -13,20 +13,17 @@ public struct QuackbackConfig: Sendable {
     public let instanceUrl: URL
     public let theme: QuackbackTheme
     public let placement: QuackbackPosition
-    public let buttonColor: String?
     public let locale: String?
 
     public init(
         instanceUrl: URL,
         theme: QuackbackTheme = .system,
         placement: QuackbackPosition = .bottomRight,
-        buttonColor: String? = nil,
         locale: String? = nil
     ) {
         self.instanceUrl = instanceUrl
         self.theme = theme
         self.placement = placement
-        self.buttonColor = buttonColor
         self.locale = locale
     }
 
