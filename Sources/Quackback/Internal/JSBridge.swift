@@ -4,7 +4,7 @@ enum JSBridge {
     struct ParsedEvent { let event: QuackbackEvent; let data: [String: Any] }
 
     static func initCommand(config: QuackbackConfig) -> String {
-        var p: [String: String] = ["appId": config.appId, "theme": config.theme.rawValue]
+        var p: [String: String] = ["theme": config.theme.rawValue]
         if let l = config.locale { p["locale"] = l }
         return "window.postMessage({type:'quackback:init',data:\(json(p))},'*');"
     }
@@ -28,12 +28,25 @@ enum JSBridge {
         "window.postMessage({type:'quackback:identify',data:{\"anonymous\":true}},'*');"
     }
 
-    static func openCommand(board: String?) -> String {
-        guard let b = board else { return "window.postMessage({type:'quackback:open'},'*');" }
-        return "window.postMessage({type:'quackback:open',data:\(json(["board": b]))},'*');"
+    static func openCommand(view: OpenView? = nil, title: String? = nil, board: String? = nil) -> String {
+        var p: [String: String] = [:]
+        if let v = view { p["view"] = v.rawValue }
+        if let t = title { p["title"] = t }
+        if let b = board { p["board"] = b }
+        if p.isEmpty { return "window.postMessage({type:'quackback:open'},'*');" }
+        return "window.postMessage({type:'quackback:open',data:\(json(p))},'*');"
     }
 
     static func logoutCommand() -> String { "window.postMessage({type:'quackback:identify',data:null},'*');" }
+
+    static func metadataCommand(_ patch: [String: String?]) -> String {
+        // nil values mean "remove this key" — the iframe interprets null as delete
+        var dict: [String: Any] = [:]
+        for (k, v) in patch { dict[k] = v as Any? ?? NSNull() }
+        let d = try! JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys])
+        let json = String(data: d, encoding: .utf8)!
+        return "window.postMessage({type:'quackback:metadata',data:\(json)},'*');"
+    }
 
     static func parseEvent(_ jsonString: String) -> ParsedEvent? {
         guard let data = jsonString.data(using: .utf8),

@@ -13,7 +13,7 @@ public enum Quackback {
 
     public static func configure(_ config: QuackbackConfig, identity: Identity? = nil) {
         self.config = config
-        fetchTheme(baseURL: config.baseURL)
+        fetchTheme(appUrl: config.appUrl)
         if let identity { applyIdentity(identity) }
     }
 
@@ -24,6 +24,12 @@ public enum Quackback {
     }
     public static func logout() { enqueue(JSBridge.logoutCommand()) }
 
+    /// Attach session metadata to feedback submitted through the widget.
+    /// Pass `nil` as a value to remove a previously-set key.
+    public static func metadata(_ patch: [String: String?]) {
+        enqueue(JSBridge.metadataCommand(patch))
+    }
+
     private static func applyIdentity(_ identity: Identity) {
         switch identity {
         case .user(let id, let email, let name, let avatarURL):
@@ -32,16 +38,18 @@ public enum Quackback {
         }
     }
 
-    public static func open(board: String? = nil) {
-        guard let config else { return }; ensureWV(config)
-        wvManager?.execute(JSBridge.openCommand(board: board)); presentPanel()
+    public static func open(view: OpenView? = nil, title: String? = nil, board: String? = nil) {
+        guard let config else { return }
+        ensureWV(config)
+        wvManager?.execute(JSBridge.openCommand(view: view, title: title, board: board))
+        presentPanel()
     }
     public static func close() { dismissPanel() }
 
     public static func showLauncher() {
         guard let config, launcher == nil else { return }
         let color = resolveColor(config: config)
-        let btn = LauncherButton(position: config.position, color: color)
+        let btn = LauncherButton(position: config.placement, color: color)
         btn.addTarget(self, action: #selector(launcherTapped), for: .touchUpInside)
         if let w = keyWindow { btn.install(in: w) }; launcher = btn
     }
@@ -67,8 +75,8 @@ public enum Quackback {
         return serverThemeColor ?? defaultColor
     }
 
-    private static func fetchTheme(baseURL: String) {
-        guard let url = URL(string: "\(baseURL)/api/widget/config.json") else { return }
+    private static func fetchTheme(appUrl: URL) {
+        let url = appUrl.appendingPathComponent("api/widget/config.json")
         URLSession.shared.dataTask(with: url) { data, _, _ in
             guard let data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
@@ -136,7 +144,8 @@ public enum Quackback {
     public static func identify(ssoToken: String) {}
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {}
     public static func logout() {}
-    public static func open(board: String? = nil) {}
+    public static func metadata(_ patch: [String: String?]) {}
+    public static func open(view: OpenView? = nil, title: String? = nil, board: String? = nil) {}
     public static func close() {}
     public static func showLauncher() {}
     public static func hideLauncher() {}

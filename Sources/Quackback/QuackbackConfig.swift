@@ -10,24 +10,28 @@ public enum QuackbackPosition: Sendable {
 }
 
 public struct QuackbackConfig: Sendable {
-    public let appId: String
-    public let baseURL: URL
+    public let appUrl: URL
     public let theme: QuackbackTheme
-    public let position: QuackbackPosition
+    public let placement: QuackbackPosition
     public let buttonColor: String?
     public let locale: String?
 
     public init(
-        appId: String, baseURL: URL,
-        theme: QuackbackTheme = .system, position: QuackbackPosition = .bottomRight,
-        buttonColor: String? = nil, locale: String? = nil
+        appUrl: URL,
+        theme: QuackbackTheme = .system,
+        placement: QuackbackPosition = .bottomRight,
+        buttonColor: String? = nil,
+        locale: String? = nil
     ) {
-        self.appId = appId; self.baseURL = baseURL; self.theme = theme
-        self.position = position; self.buttonColor = buttonColor; self.locale = locale
+        self.appUrl = appUrl
+        self.theme = theme
+        self.placement = placement
+        self.buttonColor = buttonColor
+        self.locale = locale
     }
 
     public var widgetURL: URL {
-        var c = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)!
+        var c = URLComponents(url: appUrl, resolvingAgainstBaseURL: false)!
         c.path = "/widget"
         c.queryItems = [
             URLQueryItem(name: "source", value: "native"),

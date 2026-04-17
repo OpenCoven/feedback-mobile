@@ -35,8 +35,7 @@ import Quackback
 
 // 1. Configure once at app startup
 Quackback.configure(QuackbackConfig(
-    appId: "your-app-id",
-    baseURL: URL(string: "https://feedback.yourapp.com")!
+    appUrl: URL(string: "https://feedback.yourapp.com")!
 ))
 
 // 2. Identify the current user
@@ -64,6 +63,7 @@ Turn on **Verified identity only** in **Admin → Settings → Widget** to requi
 | `Quackback.identify(userId:email:name:avatarURL:)` | Identify the current user with their details. Simplest option, works out of the box. |
 | `Quackback.identify(ssoToken:)` | Identify the current user with a server-signed JWT. Blocks impersonation. |
 | `Quackback.logout()` | Clear the current user identity. |
+| `Quackback.metadata(_:)` | Attach session metadata (`[String: String?]`) to feedback. Pass `nil` values to remove keys. |
 
 ### Identity
 
@@ -74,7 +74,7 @@ Quackback.configure(config, identity: .user(id: "u_123", email: "a@b.com", name:
 Quackback.configure(config, identity: .ssoToken("jwt..."))
 // Omit the `identity` parameter for anonymous sessions — it's the default.
 ```
-| `Quackback.open(board:)` | Open the feedback panel, optionally on a specific board slug. |
+| `Quackback.open(view:title:board:)` | Open the feedback panel. All parameters optional — see [Open options](#open-options). |
 | `Quackback.close()` | Dismiss the feedback panel. |
 | `Quackback.showLauncher()` | Add the floating launcher button to the key window. |
 | `Quackback.hideLauncher()` | Remove the floating launcher button. |
@@ -86,13 +86,33 @@ Quackback.configure(config, identity: .ssoToken("jwt..."))
 
 ```swift
 QuackbackConfig(
-    appId: String,                         // required — your Quackback app ID
-    baseURL: URL,                          // required — your Quackback instance URL
-    theme: QuackbackTheme = .system,       // .light | .dark | .system
-    position: QuackbackPosition = .bottomRight, // .bottomRight | .bottomLeft
-    buttonColor: String? = nil,            // hex color e.g. "#6366F1"
-    locale: String? = nil                  // BCP-47 locale e.g. "fr", "de"
+    appUrl: URL,                                  // required — your Quackback instance URL
+    theme: QuackbackTheme = .system,              // .light | .dark | .system
+    placement: QuackbackPosition = .bottomRight,  // .bottomRight | .bottomLeft
+    buttonColor: String? = nil,                   // hex color e.g. "#6366F1"
+    locale: String? = nil                         // BCP-47 locale e.g. "fr", "de"
 )
+```
+
+### Metadata
+
+Attach key-value context to the widget session. Stored on posts created through the widget.
+
+```swift
+Quackback.metadata(["page": "/settings", "app_version": "2.4.1"])
+// Pass nil to remove a key:
+Quackback.metadata(["page": nil])
+```
+
+### Open options
+
+`Quackback.open(view:title:board:)` pre-fills the widget panel:
+
+```swift
+Quackback.open()                                                           // home
+Quackback.open(board: "feature-requests")                                  // board filter
+Quackback.open(view: .newPost, title: "Bug: crash on save", board: "bugs") // new-post form
+Quackback.open(view: .changelog)                                           // changelog feed
 ```
 
 ## Events
