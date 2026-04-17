@@ -11,9 +11,10 @@ public enum Quackback {
     private static var pendingIdentify: String?
     private static var serverThemeColor: UIColor?
 
-    public static func configure(_ config: QuackbackConfig) {
+    public static func configure(_ config: QuackbackConfig, identity: Identity? = nil) {
         self.config = config
         fetchTheme(baseURL: config.baseURL)
+        if let identity { applyIdentity(identity) }
     }
 
     public static func identify() { enqueue(JSBridge.identifyAnonymousCommand()) }
@@ -22,6 +23,15 @@ public enum Quackback {
         enqueue(JSBridge.identifyCommand(userId: userId, email: email, name: name, avatarURL: avatarURL))
     }
     public static func logout() { enqueue(JSBridge.logoutCommand()) }
+
+    private static func applyIdentity(_ identity: Identity) {
+        switch identity {
+        case .anonymous: identify()
+        case .user(let id, let email, let name, let avatarURL):
+            identify(userId: id, email: email, name: name, avatarURL: avatarURL)
+        case .ssoToken(let token): identify(ssoToken: token)
+        }
+    }
 
     public static func open(board: String? = nil) {
         guard let config else { return }; ensureWV(config)
@@ -122,7 +132,7 @@ public enum Quackback {
     private static var config: QuackbackConfig?
     private static let emitter = EventEmitter()
 
-    public static func configure(_ config: QuackbackConfig) { self.config = config }
+    public static func configure(_ config: QuackbackConfig, identity: Identity? = nil) { self.config = config }
     public static func identify() {}
     public static func identify(ssoToken: String) {}
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {}

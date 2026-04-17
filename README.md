@@ -59,11 +59,22 @@ Turn on **Verified identity only** in **Admin → Settings → Widget** to requi
 
 | Method | Description |
 |--------|-------------|
-| `Quackback.configure(_ config: QuackbackConfig)` | Set up the SDK. Call once at app launch before any other method. |
+| `Quackback.configure(_ config: QuackbackConfig, identity: Identity? = nil)` | Set up the SDK. Pass an optional `Identity` to bundle identification into the same call. |
 | `Quackback.identify()` | Start an anonymous session. The widget prompts for an email inline the first time the user posts. |
 | `Quackback.identify(userId:email:name:avatarURL:)` | Identify the current user with their details. Simplest option, works out of the box. |
 | `Quackback.identify(ssoToken:)` | Identify the current user with a server-signed JWT. Blocks impersonation. |
 | `Quackback.logout()` | Clear the current user identity. |
+
+### Identity
+
+Pass an `Identity` value to `configure(_:identity:)` to bundle identification at setup time:
+
+```swift
+Quackback.configure(config, identity: .user(id: "u_123", email: "a@b.com", name: "Ada"))
+Quackback.configure(config, identity: .ssoToken("jwt..."))
+Quackback.configure(config, identity: .anonymous)
+// Or omit the parameter and call Quackback.identify(...) later.
+```
 | `Quackback.open(board:)` | Open the feedback panel, optionally on a specific board slug. |
 | `Quackback.close()` | Dismiss the feedback panel. |
 | `Quackback.showTrigger()` | Add the floating trigger button to the key window. |
