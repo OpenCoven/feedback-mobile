@@ -72,8 +72,7 @@ Pass an `Identity` value to `configure(_:identity:)` to bundle identification at
 ```swift
 Quackback.configure(config, identity: .user(id: "u_123", email: "a@b.com", name: "Ada"))
 Quackback.configure(config, identity: .ssoToken("jwt..."))
-Quackback.configure(config, identity: .anonymous)
-// Or omit the parameter and call Quackback.identify(...) later.
+// Omit the `identity` parameter for anonymous sessions — it's the default.
 ```
 | `Quackback.open(board:)` | Open the feedback panel, optionally on a specific board slug. |
 | `Quackback.close()` | Dismiss the feedback panel. |

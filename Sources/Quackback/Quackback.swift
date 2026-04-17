@@ -26,7 +26,6 @@ public enum Quackback {
 
     private static func applyIdentity(_ identity: Identity) {
         switch identity {
-        case .anonymous: identify()
         case .user(let id, let email, let name, let avatarURL):
             identify(userId: id, email: email, name: name, avatarURL: avatarURL)
         case .ssoToken(let token): identify(ssoToken: token)
