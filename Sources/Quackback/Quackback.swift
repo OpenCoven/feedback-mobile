@@ -16,11 +16,11 @@ public enum Quackback {
         fetchTheme(baseURL: config.baseURL)
     }
 
+    public static func identify() { enqueue(JSBridge.identifyAnonymousCommand()) }
     public static func identify(ssoToken: String) { enqueue(JSBridge.identifyCommand(ssoToken: ssoToken)) }
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {
         enqueue(JSBridge.identifyCommand(userId: userId, email: email, name: name, avatarURL: avatarURL))
     }
-    public static func identifyAnonymous() { enqueue(JSBridge.identifyAnonymousCommand()) }
     public static func logout() { enqueue(JSBridge.logoutCommand()) }
 
     public static func open(board: String? = nil) {
@@ -123,9 +123,9 @@ public enum Quackback {
     private static let emitter = EventEmitter()
 
     public static func configure(_ config: QuackbackConfig) { self.config = config }
+    public static func identify() {}
     public static func identify(ssoToken: String) {}
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {}
-    public static func identifyAnonymous() {}
     public static func logout() {}
     public static func open(board: String? = nil) {}
     public static func close() {}

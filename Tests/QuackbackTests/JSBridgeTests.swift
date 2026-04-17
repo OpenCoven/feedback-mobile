@@ -19,7 +19,7 @@ final class JSBridgeTests: XCTestCase {
         XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:identify"))
         XCTAssertTrue(js.contains("\"id\":\"u1\"")); XCTAssertTrue(js.contains("\"email\":\"a@b.c\""))
     }
-    func testIdentifyAnonymous() {
+    func testIdentifyAnonymousCommand() {
         let js = JSBridge.identifyAnonymousCommand()
         XCTAssertTrue(js.contains("window.postMessage")); XCTAssertTrue(js.contains("quackback:identify"))
         XCTAssertTrue(js.contains("\"anonymous\":true"))
