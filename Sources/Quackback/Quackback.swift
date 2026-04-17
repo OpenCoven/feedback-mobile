@@ -13,7 +13,7 @@ public enum Quackback {
 
     public static func configure(_ config: QuackbackConfig, identity: Identity? = nil) {
         self.config = config
-        fetchTheme(appUrl: config.appUrl)
+        fetchTheme(instanceUrl: config.instanceUrl)
         if let identity { applyIdentity(identity) }
     }
 
@@ -75,8 +75,8 @@ public enum Quackback {
         return serverThemeColor ?? defaultColor
     }
 
-    private static func fetchTheme(appUrl: URL) {
-        let url = appUrl.appendingPathComponent("api/widget/config.json")
+    private static func fetchTheme(instanceUrl: URL) {
+        let url = instanceUrl.appendingPathComponent("api/widget/config.json")
         URLSession.shared.dataTask(with: url) { data, _, _ in
             guard let data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],

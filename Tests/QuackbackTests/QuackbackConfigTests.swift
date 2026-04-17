@@ -3,7 +3,7 @@ import XCTest
 
 final class QuackbackConfigTests: XCTestCase {
     func testDefaults() {
-        let c = QuackbackConfig(appUrl: URL(string: "https://fb.example.com")!)
+        let c = QuackbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
         XCTAssertEqual(c.theme, .system)
         XCTAssertEqual(c.placement, .bottomRight)
         XCTAssertNil(c.buttonColor)
@@ -11,7 +11,7 @@ final class QuackbackConfigTests: XCTestCase {
     }
 
     func testWidgetURL() {
-        let c = QuackbackConfig(appUrl: URL(string: "https://fb.example.com")!)
+        let c = QuackbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
         let url = c.widgetURL
         XCTAssertEqual(url.path, "/widget")
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)!.queryItems!
@@ -21,7 +21,7 @@ final class QuackbackConfigTests: XCTestCase {
 
     func testCustomValues() {
         let c = QuackbackConfig(
-            appUrl: URL(string: "https://fb.example.com")!,
+            instanceUrl: URL(string: "https://fb.example.com")!,
             theme: .dark, placement: .bottomLeft, buttonColor: "#FF0000", locale: "fr"
         )
         XCTAssertEqual(c.theme, .dark)
@@ -37,13 +37,13 @@ final class QuackbackConfigTests: XCTestCase {
     }
 
     func testWidgetURLPreservesHost() {
-        let c = QuackbackConfig(appUrl: URL(string: "https://custom.domain.com")!)
+        let c = QuackbackConfig(instanceUrl: URL(string: "https://custom.domain.com")!)
         XCTAssertEqual(c.widgetURL.host, "custom.domain.com")
         XCTAssertEqual(c.widgetURL.scheme, "https")
     }
 
     func testWidgetURLWithPort() {
-        let c = QuackbackConfig(appUrl: URL(string: "http://localhost:3000")!)
+        let c = QuackbackConfig(instanceUrl: URL(string: "http://localhost:3000")!)
         let url = c.widgetURL
         XCTAssertEqual(url.port, 3000)
         XCTAssertEqual(url.path, "/widget")

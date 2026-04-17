@@ -3,7 +3,7 @@ import XCTest
 
 final class JSBridgeTests: XCTestCase {
     func testInitCommand() {
-        let config = QuackbackConfig(appUrl: URL(string: "https://x.com")!, theme: .dark, locale: "fr")
+        let config = QuackbackConfig(instanceUrl: URL(string: "https://x.com")!, theme: .dark, locale: "fr")
         let js = JSBridge.initCommand(config: config)
         XCTAssertTrue(js.contains("window.postMessage"))
         XCTAssertTrue(js.contains("quackback:init"))
@@ -68,14 +68,14 @@ final class JSBridgeTests: XCTestCase {
     func testParseInvalid() { XCTAssertNil(JSBridge.parseEvent("bad")) }
 
     func testInitCommandWithoutLocale() {
-        let config = QuackbackConfig(appUrl: URL(string: "https://x.com")!, theme: .light)
+        let config = QuackbackConfig(instanceUrl: URL(string: "https://x.com")!, theme: .light)
         let js = JSBridge.initCommand(config: config)
         XCTAssertTrue(js.contains("\"theme\":\"light\""))
         XCTAssertFalse(js.contains("locale"))
     }
 
     func testInitCommandSystemTheme() {
-        let config = QuackbackConfig(appUrl: URL(string: "https://x.com")!)
+        let config = QuackbackConfig(instanceUrl: URL(string: "https://x.com")!)
         let js = JSBridge.initCommand(config: config)
         XCTAssertTrue(js.contains("\"theme\":\"user\""))
     }
@@ -131,7 +131,7 @@ final class JSBridgeTests: XCTestCase {
     }
 
     func testCommandsEndWithSemicolon() {
-        let config = QuackbackConfig(appUrl: URL(string: "https://x.com")!)
+        let config = QuackbackConfig(instanceUrl: URL(string: "https://x.com")!)
         XCTAssertTrue(JSBridge.initCommand(config: config).hasSuffix(";"))
         XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "t").hasSuffix(";"))
         XCTAssertTrue(JSBridge.identifyCommand(userId: "u", email: "e", name: nil, avatarURL: nil).hasSuffix(";"))
@@ -143,7 +143,7 @@ final class JSBridgeTests: XCTestCase {
     }
 
     func testCommandsStartWithPostMessage() {
-        let config = QuackbackConfig(appUrl: URL(string: "https://x.com")!)
+        let config = QuackbackConfig(instanceUrl: URL(string: "https://x.com")!)
         XCTAssertTrue(JSBridge.initCommand(config: config).contains("window.postMessage"))
         XCTAssertTrue(JSBridge.identifyCommand(ssoToken: "t").contains("window.postMessage"))
         XCTAssertTrue(JSBridge.identifyAnonymousCommand().contains("window.postMessage"))

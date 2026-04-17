@@ -53,7 +53,7 @@ final class QuackbackWebView: NSObject, WKScriptMessageHandler, WKNavigationDele
     }
 
     func webView(_ wv: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if action.navigationType == .linkActivated, let url = action.request.url, url.host != config.appUrl.host {
+        if action.navigationType == .linkActivated, let url = action.request.url, url.host != config.instanceUrl.host {
             UIApplication.shared.open(url); decisionHandler(.cancel); return
         }
         decisionHandler(.allow)

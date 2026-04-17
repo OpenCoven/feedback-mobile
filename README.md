@@ -35,7 +35,7 @@ import Quackback
 
 // 1. Configure once at app startup
 Quackback.configure(QuackbackConfig(
-    appUrl: URL(string: "https://feedback.yourapp.com")!
+    instanceUrl: URL(string: "https://feedback.yourapp.com")!
 ))
 
 // 2. Identify the current user
@@ -86,7 +86,7 @@ Quackback.configure(config, identity: .ssoToken("jwt..."))
 
 ```swift
 QuackbackConfig(
-    appUrl: URL,                                  // required — your Quackback instance URL
+    instanceUrl: URL,                                  // required — your Quackback instance URL
     theme: QuackbackTheme = .system,              // .light | .dark | .system
     placement: QuackbackPosition = .bottomRight,  // .bottomRight | .bottomLeft
     buttonColor: String? = nil,                   // hex color e.g. "#6366F1"
