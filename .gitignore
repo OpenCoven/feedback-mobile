@@ -4,3 +4,26 @@
 *.xcodeproj
 xcuserdata/
 DerivedData/
+
+# ── Secrets & local config ──────────────────────────────────────────────────
+FeedbackApp/FeedbackApp.xcconfig
+*.xcconfig
+!*.xcconfig.template
+
+.env
+.env.*
+!.env.example
+
+# ── Xcode / build ────────────────────────────────────────────────────────────
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+DerivedData/
+build/
+.build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# ── Swift PM ─────────────────────────────────────────────────────────────────
+.swiftpm/

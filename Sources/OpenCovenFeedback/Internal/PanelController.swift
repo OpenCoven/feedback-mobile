@@ -9,7 +9,7 @@ final class PanelController: UIViewController {
         self.webViewManager = webViewManager; super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
     }
-    @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     override func viewDidLoad() {
         super.viewDidLoad(); webViewManager.loadIfNeeded()

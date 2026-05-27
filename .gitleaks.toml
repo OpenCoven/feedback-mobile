@@ -1,0 +1,38 @@
+title = "OpenCoven Feedback iOS — Secret Detection"
+description = "Blocks commits containing secrets, tokens, or private keys."
+
+[[rules]]
+id = "coven-token"
+description = "Coven Gateway token"
+regex = '''ck_(live|test)_[A-Za-z0-9]{20,}'''
+tags = ["opencoven"]
+
+[[rules]]
+id = "private-key"
+description = "PEM private key"
+regex = '''-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY'''
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+
+[[rules]]
+id = "stripe-secret"
+description = "Stripe secret key"
+regex = '''sk_(live|test)_[0-9a-zA-Z]{24,}'''
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+  '''.gitleaks.toml''',
+  '''CHANGELOG\.md''',
+  '''README\.md''',
+  '''.*\.xcconfig\.template''',
+]
+regexes = [
+  '''localhost''',
+  '''example\.com''',
+  '''yourapp\.com''',
+  '''\$\(FEEDBACK_INSTANCE_URL\)''',
+]

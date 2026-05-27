@@ -1,0 +1,9 @@
+// FeedbackApp.xcconfig.template
+//
+// Copy this file to FeedbackApp.xcconfig (gitignored) and fill in your values.
+// NEVER commit the real .xcconfig — only commit this .template file.
+//
+// In Xcode: Project > Info > Configurations, point each config to FeedbackApp.xcconfig
+
+// Your deployed OpenCoven Feedback instance URL (no trailing slash)
+FEEDBACK_INSTANCE_URL = https://feedback.yourapp.com

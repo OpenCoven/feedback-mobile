@@ -1,5 +1,5 @@
-import SwiftUI
 import OpenCovenFeedback
+import SwiftUI
 
 @main
 struct OpenCovenFeedbackExampleApp: App {

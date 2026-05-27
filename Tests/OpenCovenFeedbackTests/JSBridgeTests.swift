@@ -1,5 +1,5 @@
-import XCTest
 @testable import OpenCovenFeedback
+import XCTest
 
 final class JSBridgeTests: XCTestCase {
     func testInitCommand() {

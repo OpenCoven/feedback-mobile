@@ -68,10 +68,10 @@ public enum OpenCovenFeedback {
 
     // MARK: - Private
 
-    private static let defaultColor = UIColor(red: 99/255, green: 102/255, blue: 241/255, alpha: 1)
+    private static let defaultColor = UIColor(red: 99 / 255, green: 102 / 255, blue: 241 / 255, alpha: 1)
 
     private static func resolveColor(config: OpenCovenFeedbackConfig) -> UIColor {
-        return serverThemeColor ?? defaultColor
+        serverThemeColor ?? defaultColor
     }
 
     private static func fetchTheme(instanceUrl: URL) {
@@ -107,7 +107,7 @@ public enum OpenCovenFeedback {
     private static func dismissPanel() {
         panel?.dismiss(animated: true); panel = nil; isShowing = false; launcher?.setOpen(false)
     }
-    @objc private static func launcherTapped() { isShowing ? close() : open() }
+    @objc private static func launcherTapped() { if isShowing { close() } else { open() } }
 
     private static var keyWindow: UIWindow? {
         UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).first { $0.isKeyWindow }
