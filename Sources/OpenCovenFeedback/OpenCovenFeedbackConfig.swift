@@ -1,24 +1,24 @@
 import Foundation
 
-public enum QuackbackTheme: String, Sendable {
+public enum OpenCovenFeedbackTheme: String, Sendable {
     case light, dark
     case system = "user"
 }
 
-public enum QuackbackPosition: Sendable {
+public enum OpenCovenFeedbackPosition: Sendable {
     case bottomRight, bottomLeft
 }
 
-public struct QuackbackConfig: Sendable {
+public struct OpenCovenFeedbackConfig: Sendable {
     public let instanceUrl: URL
-    public let theme: QuackbackTheme
-    public let placement: QuackbackPosition
+    public let theme: OpenCovenFeedbackTheme
+    public let placement: OpenCovenFeedbackPosition
     public let locale: String?
 
     public init(
         instanceUrl: URL,
-        theme: QuackbackTheme = .system,
-        placement: QuackbackPosition = .bottomRight,
+        theme: OpenCovenFeedbackTheme = .system,
+        placement: OpenCovenFeedbackPosition = .bottomRight,
         locale: String? = nil
     ) {
         self.instanceUrl = instanceUrl

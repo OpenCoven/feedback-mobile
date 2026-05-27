@@ -1,7 +1,7 @@
 import XCTest
-@testable import Quackback
+@testable import OpenCovenFeedback
 
-final class QuackbackEventTests: XCTestCase {
+final class OpenCovenFeedbackEventTests: XCTestCase {
     func testAddAndFire() {
         let emitter = EventEmitter()
         let exp = expectation(description: "fired")
@@ -71,8 +71,8 @@ final class QuackbackEventTests: XCTestCase {
 
     func testAllEventTypes() {
         let emitter = EventEmitter()
-        var received: [QuackbackEvent] = []
-        for event in [QuackbackEvent.ready, .vote, .submit, .close, .navigate] {
+        var received: [OpenCovenFeedbackEvent] = []
+        for event in [OpenCovenFeedbackEvent.ready, .vote, .submit, .close, .navigate] {
             emitter.on(event) { _ in received.append(event) }
             emitter.emit(event, data: [:])
         }
@@ -80,10 +80,10 @@ final class QuackbackEventTests: XCTestCase {
     }
 
     func testEventRawValues() {
-        XCTAssertEqual(QuackbackEvent.ready.rawValue, "ready")
-        XCTAssertEqual(QuackbackEvent.vote.rawValue, "vote")
-        XCTAssertEqual(QuackbackEvent.submit.rawValue, "submit")
-        XCTAssertEqual(QuackbackEvent.close.rawValue, "close")
-        XCTAssertEqual(QuackbackEvent.navigate.rawValue, "navigate")
+        XCTAssertEqual(OpenCovenFeedbackEvent.ready.rawValue, "ready")
+        XCTAssertEqual(OpenCovenFeedbackEvent.vote.rawValue, "vote")
+        XCTAssertEqual(OpenCovenFeedbackEvent.submit.rawValue, "submit")
+        XCTAssertEqual(OpenCovenFeedbackEvent.close.rawValue, "close")
+        XCTAssertEqual(OpenCovenFeedbackEvent.navigate.rawValue, "navigate")
     }
 }

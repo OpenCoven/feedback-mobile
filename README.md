@@ -1,6 +1,6 @@
-# Quackback iOS SDK
+# OpenCoven Feedback — iOS SDK
 
-Embed the [Quackback](https://quackback.io) feedback widget in your iOS app with a single floating launcher button or programmatic open/close.
+Embed the [OpenCoven Feedback](https://github.com/OpenCoven/feedback) widget in your iOS app with a single floating launcher button or programmatic open/close.
 
 ## Requirements
 
@@ -11,130 +11,74 @@ Embed the [Quackback](https://quackback.io) feedback widget in your iOS app with
 
 ### Swift Package Manager
 
-Add the package in Xcode: **File > Add Package Dependencies**, then enter the repository URL:
+Add the package in Xcode: **File > Add Package Dependencies**, then enter:
 
 ```
-https://github.com/quackback/quackback-ios
+https://github.com/OpenCoven/feedback-mobile
 ```
 
 Or add it directly to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/quackback/quackback-ios", from: "1.0.0"),
+    .package(url: "https://github.com/OpenCoven/feedback-mobile", from: "1.0.0"),
 ],
 targets: [
-    .target(name: "YourApp", dependencies: ["Quackback"]),
+    .target(name: "YourApp", dependencies: ["OpenCovenFeedback"]),
 ]
 ```
 
 ## Quick Start
 
 ```swift
-import Quackback
+import OpenCovenFeedback
 
 // 1. Configure once at app startup
-Quackback.configure(QuackbackConfig(
+OpenCovenFeedback.configure(OpenCovenFeedbackConfig(
     instanceUrl: URL(string: "https://feedback.yourapp.com")!
 ))
 
-// 2. Identify the current user
-Quackback.identify(userId: "user_123", email: "user@example.com", name: "Jane Smith")
-// or, with a server-signed token (recommended for production):
-Quackback.identify(ssoToken: fetchedSsoToken)
-// or, for unauthenticated visitors:
-Quackback.identify()
+// 2. Show the floating launcher button
+OpenCovenFeedback.showLauncher()
 
-// 3. Show the floating launcher button
-Quackback.showLauncher()
-
-// 4. On logout
-Quackback.logout()
+// 3. Or open programmatically
+OpenCovenFeedback.open()
 ```
 
-Turn on **Verified identity only** in **Admin → Settings → Widget** to require `ssoToken` for every identified user. See the [Identify users guide](https://quackback.io/docs/widget/identify-users) for JWT claims and server examples.
-
-## API
-
-| Method | Description |
-|--------|-------------|
-| `Quackback.configure(_ config: QuackbackConfig, identity: Identity? = nil)` | Set up the SDK. Pass an optional `Identity` to bundle identification into the same call. |
-| `Quackback.identify()` | Start an anonymous session. The widget prompts for an email inline the first time the user posts. |
-| `Quackback.identify(userId:email:name:avatarURL:)` | Identify the current user with their details. Simplest option, works out of the box. |
-| `Quackback.identify(ssoToken:)` | Identify the current user with a server-signed JWT. Blocks impersonation. |
-| `Quackback.logout()` | Clear the current user identity. |
-| `Quackback.metadata(_:)` | Attach session metadata (`[String: String?]`) to feedback. Pass `nil` values to remove keys. |
-
-### Identity
-
-Pass an `Identity` value to `configure(_:identity:)` to bundle identification at setup time:
+## Identify users
 
 ```swift
-Quackback.configure(config, identity: .user(id: "u_123", email: "a@b.com", name: "Ada"))
-Quackback.configure(config, identity: .ssoToken("jwt..."))
-// Omit the `identity` parameter for anonymous sessions — it's the default.
-```
-| `Quackback.open(view:title:board:)` | Open the feedback panel. All parameters optional — see [Open options](#open-options). |
-| `Quackback.close()` | Dismiss the feedback panel. |
-| `Quackback.showLauncher()` | Add the floating launcher button to the key window. |
-| `Quackback.hideLauncher()` | Remove the floating launcher button. |
-| `Quackback.on(_:handler:) -> EventToken` | Subscribe to a widget event. Returns a token for removal. |
-| `Quackback.off(_ token: EventToken)` | Unsubscribe a previously registered listener. |
-| `Quackback.destroy()` | Tear down the SDK entirely (removes WebView, launcher, and all listeners). |
+// Anonymous
+OpenCovenFeedback.identify()
 
-### QuackbackConfig
+// Known user
+OpenCovenFeedback.identify(userId: "u_123", email: "val@example.com", name: "Val")
 
-```swift
-QuackbackConfig(
-    instanceUrl: URL,                                  // required — your Quackback instance URL
-    theme: QuackbackTheme = .system,              // .light | .dark | .system
-    placement: QuackbackPosition = .bottomRight,  // .bottomRight | .bottomLeft
-    locale: String? = nil                         // BCP-47 locale e.g. "fr", "de"
-)
+// SSO token
+OpenCovenFeedback.identify(ssoToken: "your-sso-token")
 ```
 
-### Metadata
+## Configuration
 
-Attach key-value context to the widget session. Stored on posts created through the widget.
-
-```swift
-Quackback.metadata(["page": "/settings", "app_version": "2.4.1"])
-// Pass nil to remove a key:
-Quackback.metadata(["page": nil])
-```
-
-### Open options
-
-`Quackback.open(view:title:board:)` pre-fills the widget panel:
-
-```swift
-Quackback.open()                                                           // home
-Quackback.open(board: "feature-requests")                                  // board filter
-Quackback.open(view: .newPost, title: "Bug: crash on save", board: "bugs") // new-post form
-Quackback.open(view: .changelog)                                           // changelog feed
-```
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `instanceUrl` | `URL` | required | Your OpenCoven Feedback instance URL |
+| `theme` | `OpenCovenFeedbackTheme` | `.system` | `.light`, `.dark`, or `.system` |
+| `placement` | `OpenCovenFeedbackPosition` | `.bottomRight` | `.bottomRight` or `.bottomLeft` |
+| `locale` | `String?` | `nil` | Override locale, e.g. `"fr"` |
 
 ## Events
 
-Subscribe to events emitted by the widget:
-
 ```swift
-let token = Quackback.on(.vote) { data in
-    print("User voted on post:", data["postId"] ?? "")
+let token = OpenCovenFeedback.on(.open) { data in
+    print("Widget opened", data)
 }
 
-// Remove the listener when no longer needed
-Quackback.off(token)
+// Remove listener
+OpenCovenFeedback.off(token)
 ```
 
-| Event | Payload keys | Description |
-|-------|-------------|-------------|
-| `.ready` | — | Widget has loaded and initialised. |
-| `.vote` | `postId`, `direction` | User voted on a post. |
-| `.submit` | `postId`, `title` | User submitted new feedback. |
-| `.close` | — | User closed the panel (panel dismisses automatically). |
-| `.navigate` | `board`, `postId` | User navigated within the widget. |
+## Related
 
-## License
-
-MIT
+- [OpenCoven Feedback (web)](https://github.com/OpenCoven/feedback)
+- [Android SDK](https://github.com/OpenCoven/quackback-android)

@@ -1,9 +1,9 @@
 import Foundation
 
-/// The identity to pass to `Quackback.configure(_:identity:)` so the widget
+/// The identity to pass to `OpenCovenFeedback.configure(_:identity:)` so the widget
 /// can associate activity with the current user at setup time.
 ///
-/// Equivalent to calling `Quackback.identify(...)` immediately after configure.
+/// Equivalent to calling `OpenCovenFeedback.identify(...)` immediately after configure.
 /// Omit the `identity` parameter entirely for anonymous sessions — the widget
 /// starts anonymous by default.
 public enum Identity {

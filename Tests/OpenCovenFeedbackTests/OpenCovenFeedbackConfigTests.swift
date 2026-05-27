@@ -1,16 +1,16 @@
 import XCTest
-@testable import Quackback
+@testable import OpenCovenFeedback
 
-final class QuackbackConfigTests: XCTestCase {
+final class OpenCovenFeedbackConfigTests: XCTestCase {
     func testDefaults() {
-        let c = QuackbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
+        let c = OpenCovenFeedbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
         XCTAssertEqual(c.theme, .system)
         XCTAssertEqual(c.placement, .bottomRight)
         XCTAssertNil(c.locale)
     }
 
     func testWidgetURL() {
-        let c = QuackbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
+        let c = OpenCovenFeedbackConfig(instanceUrl: URL(string: "https://fb.example.com")!)
         let url = c.widgetURL
         XCTAssertEqual(url.path, "/widget")
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)!.queryItems!
@@ -19,7 +19,7 @@ final class QuackbackConfigTests: XCTestCase {
     }
 
     func testCustomValues() {
-        let c = QuackbackConfig(
+        let c = OpenCovenFeedbackConfig(
             instanceUrl: URL(string: "https://fb.example.com")!,
             theme: .dark, placement: .bottomLeft, locale: "fr"
         )
@@ -29,19 +29,19 @@ final class QuackbackConfigTests: XCTestCase {
     }
 
     func testThemeRawValues() {
-        XCTAssertEqual(QuackbackTheme.light.rawValue, "light")
-        XCTAssertEqual(QuackbackTheme.dark.rawValue, "dark")
-        XCTAssertEqual(QuackbackTheme.system.rawValue, "user")
+        XCTAssertEqual(OpenCovenFeedbackTheme.light.rawValue, "light")
+        XCTAssertEqual(OpenCovenFeedbackTheme.dark.rawValue, "dark")
+        XCTAssertEqual(OpenCovenFeedbackTheme.system.rawValue, "user")
     }
 
     func testWidgetURLPreservesHost() {
-        let c = QuackbackConfig(instanceUrl: URL(string: "https://custom.domain.com")!)
+        let c = OpenCovenFeedbackConfig(instanceUrl: URL(string: "https://custom.domain.com")!)
         XCTAssertEqual(c.widgetURL.host, "custom.domain.com")
         XCTAssertEqual(c.widgetURL.scheme, "https")
     }
 
     func testWidgetURLWithPort() {
-        let c = QuackbackConfig(instanceUrl: URL(string: "http://localhost:3000")!)
+        let c = OpenCovenFeedbackConfig(instanceUrl: URL(string: "http://localhost:3000")!)
         let url = c.widgetURL
         XCTAssertEqual(url.port, 3000)
         XCTAssertEqual(url.path, "/widget")

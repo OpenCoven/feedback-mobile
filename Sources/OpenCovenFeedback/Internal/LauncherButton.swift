@@ -2,7 +2,7 @@
 import UIKit
 
 final class LauncherButton: UIButton {
-    private let position: QuackbackPosition
+    private let position: OpenCovenFeedbackPosition
     private var isOpen = false
     private let size: CGFloat = 48
     private let inset: CGFloat = 24
@@ -11,7 +11,7 @@ final class LauncherButton: UIButton {
     private let chatIcon = UIImageView()
     private let closeIcon = UIImageView()
 
-    init(position: QuackbackPosition, color: UIColor) {
+    init(position: OpenCovenFeedbackPosition, color: UIColor) {
         self.position = position; super.init(frame: .zero)
         backgroundColor = color; layer.cornerRadius = size / 2
         layer.shadowColor = UIColor.black.cgColor; layer.shadowOffset = CGSize(width: 0, height: 4)

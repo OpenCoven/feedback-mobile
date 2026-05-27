@@ -2,13 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "Quackback",
+    name: "OpenCovenFeedback",
     platforms: [.iOS(.v15)],
     products: [
-        .library(name: "Quackback", targets: ["Quackback"]),
+        .library(name: "OpenCovenFeedback", targets: ["OpenCovenFeedback"]),
     ],
     targets: [
-        .target(name: "Quackback", path: "Sources/Quackback"),
-        .testTarget(name: "QuackbackTests", dependencies: ["Quackback"], path: "Tests/QuackbackTests"),
+        .target(name: "OpenCovenFeedback", path: "Sources/OpenCovenFeedback"),
+        .testTarget(name: "OpenCovenFeedbackTests", dependencies: ["OpenCovenFeedback"], path: "Tests/OpenCovenFeedbackTests"),
     ]
 )

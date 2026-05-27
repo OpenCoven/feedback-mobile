@@ -1,9 +1,9 @@
 #if canImport(UIKit)
 import UIKit
 
-public enum Quackback {
-    private static var config: QuackbackConfig?
-    private static var wvManager: QuackbackWebView?
+public enum OpenCovenFeedback {
+    private static var config: OpenCovenFeedbackConfig?
+    private static var wvManager: OpenCovenFeedbackWebView?
     private static var launcher: LauncherButton?
     private static var panel: PanelController?
     private static let emitter = EventEmitter()
@@ -11,7 +11,7 @@ public enum Quackback {
     private static var pendingIdentify: String?
     private static var serverThemeColor: UIColor?
 
-    public static func configure(_ config: QuackbackConfig, identity: Identity? = nil) {
+    public static func configure(_ config: OpenCovenFeedbackConfig, identity: Identity? = nil) {
         self.config = config
         fetchTheme(instanceUrl: config.instanceUrl)
         if let identity { applyIdentity(identity) }
@@ -56,7 +56,7 @@ public enum Quackback {
     public static func hideLauncher() { launcher?.removeFromSuperview(); launcher = nil }
 
     @discardableResult
-    public static func on(_ event: QuackbackEvent, handler: @escaping @Sendable ([String: Any]) -> Void) -> EventToken {
+    public static func on(_ event: OpenCovenFeedbackEvent, handler: @escaping @Sendable ([String: Any]) -> Void) -> EventToken {
         emitter.on(event, handler: handler)
     }
     public static func off(_ token: EventToken) { emitter.off(token) }
@@ -70,7 +70,7 @@ public enum Quackback {
 
     private static let defaultColor = UIColor(red: 99/255, green: 102/255, blue: 241/255, alpha: 1)
 
-    private static func resolveColor(config: QuackbackConfig) -> UIColor {
+    private static func resolveColor(config: OpenCovenFeedbackConfig) -> UIColor {
         return serverThemeColor ?? defaultColor
     }
 
@@ -90,9 +90,9 @@ public enum Quackback {
         }.resume()
     }
 
-    private static func ensureWV(_ config: QuackbackConfig) {
+    private static func ensureWV(_ config: OpenCovenFeedbackConfig) {
         guard wvManager == nil else { return }
-        let m = QuackbackWebView(config: config); m.delegate = Delegate.shared; wvManager = m
+        let m = OpenCovenFeedbackWebView(config: config); m.delegate = Delegate.shared; wvManager = m
     }
     private static func enqueue(_ js: String) {
         if wvManager?.webView != nil { wvManager?.execute(js) } else { pendingIdentify = js }
@@ -121,9 +121,9 @@ public enum Quackback {
         return UIColor(red: CGFloat((rgb >> 16) & 0xFF) / 255, green: CGFloat((rgb >> 8) & 0xFF) / 255, blue: CGFloat(rgb & 0xFF) / 255, alpha: 1)
     }
 
-    private final class Delegate: QuackbackWebViewDelegate {
+    private final class Delegate: OpenCovenFeedbackWebViewDelegate {
         static let shared = Delegate()
-        func webViewDidReceiveEvent(_ event: QuackbackEvent, data: [String: Any]) {
+        func webViewDidReceiveEvent(_ event: OpenCovenFeedbackEvent, data: [String: Any]) {
             if event == .close { dismissPanel() }; emitter.emit(event, data: data)
         }
         func webViewDidBecomeReady() {
@@ -134,11 +134,11 @@ public enum Quackback {
 #else
 import Foundation
 
-public enum Quackback {
-    private static var config: QuackbackConfig?
+public enum OpenCovenFeedback {
+    private static var config: OpenCovenFeedbackConfig?
     private static let emitter = EventEmitter()
 
-    public static func configure(_ config: QuackbackConfig, identity: Identity? = nil) { self.config = config }
+    public static func configure(_ config: OpenCovenFeedbackConfig, identity: Identity? = nil) { self.config = config }
     public static func identify() {}
     public static func identify(ssoToken: String) {}
     public static func identify(userId: String, email: String, name: String? = nil, avatarURL: String? = nil) {}
@@ -149,7 +149,7 @@ public enum Quackback {
     public static func showLauncher() {}
     public static func hideLauncher() {}
     @discardableResult
-    public static func on(_ event: QuackbackEvent, handler: @escaping @Sendable ([String: Any]) -> Void) -> EventToken {
+    public static func on(_ event: OpenCovenFeedbackEvent, handler: @escaping @Sendable ([String: Any]) -> Void) -> EventToken {
         emitter.on(event, handler: handler)
     }
     public static func off(_ token: EventToken) { emitter.off(token) }

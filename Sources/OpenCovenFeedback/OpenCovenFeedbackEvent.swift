@@ -1,6 +1,6 @@
 import Foundation
 
-public enum QuackbackEvent: String, Sendable {
+public enum OpenCovenFeedbackEvent: String, Sendable {
     case ready, vote, submit, close, navigate
 }
 
@@ -9,10 +9,10 @@ public typealias EventListener = @Sendable ([String: Any]) -> Void
 
 final class EventEmitter: @unchecked Sendable {
     private let lock = NSLock()
-    private var listeners: [QuackbackEvent: [(token: EventToken, handler: EventListener)]] = [:]
+    private var listeners: [OpenCovenFeedbackEvent: [(token: EventToken, handler: EventListener)]] = [:]
 
     @discardableResult
-    func on(_ event: QuackbackEvent, handler: @escaping EventListener) -> EventToken {
+    func on(_ event: OpenCovenFeedbackEvent, handler: @escaping EventListener) -> EventToken {
         let token = EventToken()
         lock.lock(); listeners[event, default: []].append((token, handler)); lock.unlock()
         return token
@@ -24,7 +24,7 @@ final class EventEmitter: @unchecked Sendable {
         lock.unlock()
     }
 
-    func emit(_ event: QuackbackEvent, data: [String: Any]) {
+    func emit(_ event: OpenCovenFeedbackEvent, data: [String: Any]) {
         lock.lock(); let handlers = listeners[event] ?? []; lock.unlock()
         for (_, handler) in handlers { handler(data) }
     }

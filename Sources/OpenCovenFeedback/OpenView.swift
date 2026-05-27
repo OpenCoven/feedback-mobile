@@ -1,6 +1,6 @@
 import Foundation
 
-/// A specific view the widget can open to, passed to `Quackback.open(view:...)`.
+/// A specific view the widget can open to, passed to `OpenCovenFeedback.open(view:...)`.
 public enum OpenView: String, Sendable {
     /// Home — boards/feed list.
     case home = "home"

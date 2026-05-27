@@ -2,26 +2,26 @@
 import UIKit
 import WebKit
 
-protocol QuackbackWebViewDelegate: AnyObject {
-    func webViewDidReceiveEvent(_ event: QuackbackEvent, data: [String: Any])
+protocol OpenCovenFeedbackWebViewDelegate: AnyObject {
+    func webViewDidReceiveEvent(_ event: OpenCovenFeedbackEvent, data: [String: Any])
     func webViewDidBecomeReady()
 }
 
-final class QuackbackWebView: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+final class OpenCovenFeedbackWebView: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
     private(set) var webView: WKWebView?
-    private let config: QuackbackConfig
-    weak var delegate: QuackbackWebViewDelegate?
+    private let config: OpenCovenFeedbackConfig
+    weak var delegate: OpenCovenFeedbackWebViewDelegate?
     private var isReady = false
     private var pendingCommands: [String] = []
 
-    init(config: QuackbackConfig) { self.config = config; super.init() }
+    init(config: OpenCovenFeedbackConfig) { self.config = config; super.init() }
 
     func loadIfNeeded() {
         guard webView == nil else { return }
         let wkConfig = WKWebViewConfiguration()
         let ucc = WKUserContentController()
         ucc.addUserScript(WKUserScript(source: JSBridge.bridgeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
-        ucc.add(self, name: "quackback")
+        ucc.add(self, name: "opencoven-feedback")
         wkConfig.userContentController = ucc
         let wv = WKWebView(frame: .zero, configuration: wkConfig)
         wv.navigationDelegate = self; wv.isOpaque = false; wv.backgroundColor = .clear
@@ -35,12 +35,12 @@ final class QuackbackWebView: NSObject, WKScriptMessageHandler, WKNavigationDele
     }
 
     func tearDown() {
-        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "quackback")
+        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "opencoven-feedback")
         webView?.stopLoading(); webView = nil; isReady = false; pendingCommands.removeAll()
     }
 
     func userContentController(_ uc: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == "quackback", let body = message.body as? String,
+        guard message.name == "opencoven-feedback", let body = message.body as? String,
               let parsed = JSBridge.parseEvent(body) else { return }
         if parsed.event == .ready {
             isReady = true

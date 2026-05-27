@@ -2,10 +2,10 @@
 import UIKit
 
 final class PanelController: UIViewController {
-    private let webViewManager: QuackbackWebView
+    private let webViewManager: OpenCovenFeedbackWebView
     var onDismiss: (() -> Void)?
 
-    init(webViewManager: QuackbackWebView) {
+    init(webViewManager: OpenCovenFeedbackWebView) {
         self.webViewManager = webViewManager; super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
     }
