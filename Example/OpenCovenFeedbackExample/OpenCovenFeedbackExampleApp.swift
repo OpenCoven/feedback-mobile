@@ -8,7 +8,7 @@ struct OpenCovenFeedbackExampleApp: App {
         // In production, call OpenCovenFeedback.identify(ssoToken:) with a server-signed token
         OpenCovenFeedback.identify(userId: "user_example", email: "demo@example.com", name: "Demo User")
         OpenCovenFeedback.on(.vote) { print("[OpenCovenFeedback] vote:", $0) }
-        OpenCovenFeedback.on(.submit) { print("[OpenCovenFeedback] submit:", $0) }
+        OpenCovenFeedback.on(.postCreated) { print("[OpenCovenFeedback] post created:", $0) }
         OpenCovenFeedback.showLauncher()
     }
     var body: some Scene { WindowGroup { ContentView() } }

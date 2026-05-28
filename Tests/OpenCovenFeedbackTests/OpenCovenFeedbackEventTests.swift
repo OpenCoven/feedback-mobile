@@ -16,18 +16,18 @@ final class OpenCovenFeedbackEventTests: XCTestCase {
     func testRemove() {
         let emitter = EventEmitter()
         var count = 0
-        let token = emitter.on(.submit) { _ in count += 1 }
-        emitter.emit(.submit, data: [:]); XCTAssertEqual(count, 1)
+        let token = emitter.on(.postCreated) { _ in count += 1 }
+        emitter.emit(.postCreated, data: [:]); XCTAssertEqual(count, 1)
         emitter.off(token)
-        emitter.emit(.submit, data: [:]); XCTAssertEqual(count, 1)
+        emitter.emit(.postCreated, data: [:]); XCTAssertEqual(count, 1)
     }
 
     func testRemoveAll() {
         let emitter = EventEmitter()
         var count = 0
         emitter.on(.vote) { _ in count += 1 }
-        emitter.on(.submit) { _ in count += 1 }
-        emitter.emit(.vote, data: [:]); emitter.emit(.submit, data: [:])
+        emitter.on(.postCreated) { _ in count += 1 }
+        emitter.emit(.vote, data: [:]); emitter.emit(.postCreated, data: [:])
         XCTAssertEqual(count, 2)
         emitter.removeAll()
         emitter.emit(.vote, data: [:]); XCTAssertEqual(count, 2)
@@ -72,18 +72,24 @@ final class OpenCovenFeedbackEventTests: XCTestCase {
     func testAllEventTypes() {
         let emitter = EventEmitter()
         var received: [OpenCovenFeedbackEvent] = []
-        for event in [OpenCovenFeedbackEvent.ready, .vote, .submit, .close, .navigate] {
+        let all: [OpenCovenFeedbackEvent] = [.ready, .open, .close, .postCreated, .vote, .commentCreated, .identify, .navigate, .identifyResult, .authChange]
+        for event in all {
             emitter.on(event) { _ in received.append(event) }
             emitter.emit(event, data: [:])
         }
-        XCTAssertEqual(received, [.ready, .vote, .submit, .close, .navigate])
+        XCTAssertEqual(received, all)
     }
 
-    func testEventRawValues() {
+    func testEventRawValuesMatchContract() {
         XCTAssertEqual(OpenCovenFeedbackEvent.ready.rawValue, "ready")
-        XCTAssertEqual(OpenCovenFeedbackEvent.vote.rawValue, "vote")
-        XCTAssertEqual(OpenCovenFeedbackEvent.submit.rawValue, "submit")
+        XCTAssertEqual(OpenCovenFeedbackEvent.open.rawValue, "open")
         XCTAssertEqual(OpenCovenFeedbackEvent.close.rawValue, "close")
+        XCTAssertEqual(OpenCovenFeedbackEvent.postCreated.rawValue, "post:created")
+        XCTAssertEqual(OpenCovenFeedbackEvent.vote.rawValue, "vote")
+        XCTAssertEqual(OpenCovenFeedbackEvent.commentCreated.rawValue, "comment:created")
+        XCTAssertEqual(OpenCovenFeedbackEvent.identify.rawValue, "identify")
         XCTAssertEqual(OpenCovenFeedbackEvent.navigate.rawValue, "navigate")
+        XCTAssertEqual(OpenCovenFeedbackEvent.identifyResult.rawValue, "identify-result")
+        XCTAssertEqual(OpenCovenFeedbackEvent.authChange.rawValue, "auth-change")
     }
 }

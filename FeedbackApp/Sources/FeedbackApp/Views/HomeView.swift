@@ -63,7 +63,8 @@ struct HomeView: View {
                 icon: "newspaper.fill",
                 color: .secondary
             ) {
-                OpenCovenFeedback.open(view: .changelog)
+                // Changelog is a tab inside the widget — open the widget to reach it.
+                OpenCovenFeedback.open()
             }
         }
     }

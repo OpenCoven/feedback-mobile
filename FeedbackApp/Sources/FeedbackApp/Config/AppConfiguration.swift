@@ -34,9 +34,9 @@ final class AppConfiguration: ObservableObject {
     }
 
     private func setupEventListeners() {
-        OpenCovenFeedback.on(.submit) { data in
+        OpenCovenFeedback.on(.postCreated) { data in
             // Forward to analytics layer when integrated
-            print("[Feedback] submitted:", data)
+            print("[Feedback] post created:", data)
         }
         OpenCovenFeedback.on(.vote) { data in
             print("[Feedback] vote:", data)

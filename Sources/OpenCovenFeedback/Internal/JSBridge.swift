@@ -1,43 +1,45 @@
 import Foundation
 
+/// Builds and parses the `quackback:` postMessage protocol shared by every
+/// OpenCoven Feedback client. The wire namespace is frozen as `quackback:` for
+/// backward compatibility — it is intentionally not rebranded.
+///
+/// Source of truth: `lib/shared/widget/types.ts` and `lib/client/widget-bridge.ts`
+/// in the OpenCoven/feedback repo.
 enum JSBridge {
     struct ParsedEvent { let event: OpenCovenFeedbackEvent; let data: [String: Any] }
 
-    static func initCommand(config: OpenCovenFeedbackConfig) -> String {
-        var p: [String: String] = ["theme": config.theme.rawValue]
-        if let l = config.locale { p["locale"] = l }
-        return "window.postMessage({type:'opencoven-feedback:init',data:\(json(p))},'*');"
-    }
+    // MARK: - Inbound commands (host -> widget)
 
     static func localeCommand(_ locale: String) -> String {
-        "window.postMessage({type:'opencoven-feedback:locale',data:'\(locale)'},'*');"
+        "window.postMessage({type:'quackback:locale',data:'\(locale)'},'*');"
     }
 
     static func identifyCommand(ssoToken: String) -> String {
-        "window.postMessage({type:'opencoven-feedback:identify',data:\(json(["ssoToken": ssoToken]))},'*');"
+        "window.postMessage({type:'quackback:identify',data:\(json(["ssoToken": ssoToken]))},'*');"
     }
 
     static func identifyCommand(userId: String, email: String, name: String?, avatarURL: String?) -> String {
         var p: [String: String] = ["id": userId, "email": email]
         if let n = name { p["name"] = n }
         if let a = avatarURL { p["avatarURL"] = a }
-        return "window.postMessage({type:'opencoven-feedback:identify',data:\(json(p))},'*');"
+        return "window.postMessage({type:'quackback:identify',data:\(json(p))},'*');"
     }
 
     static func identifyAnonymousCommand() -> String {
-        "window.postMessage({type:'opencoven-feedback:identify',data:{\"anonymous\":true}},'*');"
+        "window.postMessage({type:'quackback:identify',data:{\"anonymous\":true}},'*');"
     }
+
+    static func logoutCommand() -> String { "window.postMessage({type:'quackback:identify',data:null},'*');" }
 
     static func openCommand(view: OpenView? = nil, title: String? = nil, board: String? = nil) -> String {
         var p: [String: String] = [:]
         if let v = view { p["view"] = v.rawValue }
         if let t = title { p["title"] = t }
         if let b = board { p["board"] = b }
-        if p.isEmpty { return "window.postMessage({type:'opencoven-feedback:open'},'*');" }
-        return "window.postMessage({type:'opencoven-feedback:open',data:\(json(p))},'*');"
+        if p.isEmpty { return "window.postMessage({type:'quackback:open'},'*');" }
+        return "window.postMessage({type:'quackback:open',data:\(json(p))},'*');"
     }
-
-    static func logoutCommand() -> String { "window.postMessage({type:'opencoven-feedback:identify',data:null},'*');" }
 
     static func metadataCommand(_ patch: [String: String?]) -> String {
         // nil values mean "remove this key" — the iframe interprets null as delete
@@ -45,29 +47,49 @@ enum JSBridge {
         for (k, v) in patch { dict[k] = v as Any? ?? NSNull() }
         let d = try! JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys])
         let json = String(data: d, encoding: .utf8)!
-        return "window.postMessage({type:'opencoven-feedback:metadata',data:\(json)},'*');"
+        return "window.postMessage({type:'quackback:metadata',data:\(json)},'*');"
     }
 
+    // MARK: - Outbound parsing (widget -> host)
+
+    /// The widget calls `window.__quackbackNative.dispatch(eventType, message)`.
+    /// The bridge script packs that as `{event: eventType, data: message}`.
+    ///
+    /// For `eventType == "event"` the real event name and payload live inside the
+    /// message (`quackback:event` wrapper). All other types are standalone
+    /// outbound messages (`ready`, `close`, `navigate`, `identify-result`,
+    /// `auth-change`) whose data is the message body minus its `type` key.
     static func parseEvent(_ jsonString: String) -> ParsedEvent? {
         guard let data = jsonString.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let name = obj["event"] as? String,
-              let event = OpenCovenFeedbackEvent(rawValue: name) else { return nil }
-        var eventData: [String: Any] = [:]
-        if let d = obj["data"] as? [String: Any] {
-            eventData = (d["payload"] as? [String: Any]) ?? d
+              let type = obj["event"] as? String else { return nil }
+        let message = obj["data"] as? [String: Any] ?? [:]
+
+        if type == "event" {
+            guard let name = message["name"] as? String,
+                  let event = OpenCovenFeedbackEvent(rawValue: name) else { return nil }
+            return ParsedEvent(event: event, data: message["payload"] as? [String: Any] ?? [:])
         }
-        return ParsedEvent(event: event, data: eventData)
+
+        guard let event = OpenCovenFeedbackEvent(rawValue: type) else { return nil }
+        var payload = message
+        payload.removeValue(forKey: "type")
+        return ParsedEvent(event: event, data: payload)
     }
 
+    // MARK: - Bridge script
+
+    /// Injected at document start. Defines `window.__quackbackNative.dispatch` so
+    /// the widget routes outbound messages to the native message handler instead
+    /// of `window.parent.postMessage`.
     static var bridgeScript: String {
         """
-        (function(){
-          var dispatch=function(e,d){
-            var m=JSON.stringify({event:e,data:d});
-            window.webkit.messageHandlers.opencoven-feedback.postMessage(m);
-          };
-          window.__opencoven-feedbackNative={dispatch:dispatch};
+        (function () {
+          function dispatch(type, message) {
+            var payload = JSON.stringify({ event: type, data: message });
+            window.webkit.messageHandlers.quackback.postMessage(payload);
+          }
+          window.__quackbackNative = { dispatch: dispatch };
         })();
         """
     }
