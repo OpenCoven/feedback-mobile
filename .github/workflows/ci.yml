@@ -28,23 +28,22 @@ jobs:
       - name: SwiftLint (strict)
         run: swiftlint lint --strict --config .swiftlint.yml
 
-  app-build:
-    name: Build iOS app target
+  ios-build:
+    name: Build SDK for iOS
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install XcodeGen
-        run: brew install xcodegen
+      - name: Show Xcode
+        run: xcodebuild -version
 
-      - name: Generate Xcode project
-        run: xcodegen generate
-
-      - name: Build FeedbackApp (simulator)
+      # Builds the package for the iOS Simulator SDK, compiling the
+      # `#if canImport(UIKit)` path (WebView, launcher, panel) that `swift test`
+      # on macOS does not. xcodebuild generates the package project in the
+      # runner's own compatible format — no XcodeGen version coupling.
+      - name: Build OpenCovenFeedback (iOS Simulator)
         run: |
           xcodebuild build \
-            -project FeedbackApp.xcodeproj \
-            -scheme FeedbackApp \
-            -sdk iphonesimulator \
+            -scheme OpenCovenFeedback \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
