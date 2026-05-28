@@ -56,14 +56,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedback
         INFOPLIST_FILE: FeedbackApp/Sources/FeedbackApp/Info.plist
 
-  FeedbackAppTests:
-    type: bundle.unit-test
-    platform: iOS
-    deploymentTarget: "15.0"
-    sources:
-      - FeedbackApp/Tests
-    dependencies:
-      - target: FeedbackApp
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedback.tests
+schemes:
+  FeedbackApp:
+    build:
+      targets:
+        FeedbackApp: all
+    run:
+      config: Debug

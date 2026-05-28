@@ -1,9 +1,9 @@
-included_paths:
+included:
   - FeedbackApp/
   - Sources/
   - Tests/
 
-excluded_paths:
+excluded:
   - .build/
   - DerivedData/
 
