@@ -50,7 +50,7 @@ public enum OpenCovenFeedback {
         guard let config, launcher == nil else { return }
         let color = resolveColor(config: config)
         let btn = LauncherButton(position: config.placement, color: color)
-        btn.addTarget(self, action: #selector(launcherTapped), for: .touchUpInside)
+        btn.onTap = { launcherToggle() }
         if let w = keyWindow { btn.install(in: w) }; launcher = btn
     }
     public static func hideLauncher() { launcher?.removeFromSuperview(); launcher = nil }
@@ -107,7 +107,7 @@ public enum OpenCovenFeedback {
     private static func dismissPanel() {
         panel?.dismiss(animated: true); panel = nil; isShowing = false; launcher?.setOpen(false)
     }
-    @objc private static func launcherTapped() { if isShowing { close() } else { open() } }
+    private static func launcherToggle() { if isShowing { close() } else { open() } }
 
     private static var keyWindow: UIWindow? {
         UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap(\.windows).first { $0.isKeyWindow }
