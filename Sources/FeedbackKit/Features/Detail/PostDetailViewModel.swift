@@ -31,9 +31,10 @@ public final class PostDetailViewModel: ObservableObject {
         isLoading = false
     }
 
-    public func toggleVote() async {
-        guard isSignedIn() else { needsSignIn = true; return }
-        do {
+public func toggleVote() async {
+    needsSignIn = false
+    guard isSignedIn() else { needsSignIn = true; return }
+    do {
             let result = try await api.vote(postId: postId)
             if let current = post {
                 post = PostDetail(
