@@ -3,11 +3,11 @@ import Foundation
 public struct ContentCache: Sendable {
     private let directory: URL
 
-    public init(directory: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        .appendingPathComponent("FeedbackKit")) {
-        self.directory = directory
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    }
+public init(directory: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    .appendingPathComponent("FeedbackKit")) {
+    self.directory = directory
+    try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+}
 
     public func save<T: Encodable>(_ value: T, as key: String) throws {
         let data = try Self.encoder.encode(value)
