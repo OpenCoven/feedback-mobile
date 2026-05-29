@@ -2,6 +2,7 @@ included:
   - FeedbackApp/
   - Sources/
   - Tests/
+  - App/
 
 excluded:
   - .build/

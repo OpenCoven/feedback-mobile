@@ -57,6 +57,44 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedback
         INFOPLIST_FILE: FeedbackApp/Sources/FeedbackApp/Info.plist
 
+  FeedbackPortalApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: App/FeedbackPortalApp
+        excludes:
+          - "**/*.md"
+    dependencies:
+      - package: OpenCovenFeedback
+        product: FeedbackKit
+    info:
+      path: App/FeedbackPortalApp/Info.plist
+      properties:
+        CFBundleName: "$(PRODUCT_NAME)"
+        CFBundleDisplayName: Feedback Portal
+        CFBundleIdentifier: "$(PRODUCT_BUNDLE_IDENTIFIER)"
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchStoryboardName: ""
+        FEEDBACK_INSTANCE_URL: "$(FEEDBACK_INSTANCE_URL)"
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedbackportal
+        INFOPLIST_FILE: App/FeedbackPortalApp/Info.plist
+        FEEDBACK_INSTANCE_URL: "http://localhost:3000"
+
 schemes:
   FeedbackApp:
     build:
@@ -64,3 +102,18 @@ schemes:
         FeedbackApp: all
     run:
       config: Debug
+
+  FeedbackPortalApp:
+    build:
+      targets:
+        FeedbackPortalApp: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
