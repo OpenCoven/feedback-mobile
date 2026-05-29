@@ -37,13 +37,15 @@ jobs:
       - name: Show Xcode
         run: xcodebuild -version
 
-      # Builds the package for the iOS Simulator SDK, compiling the
-      # `#if canImport(UIKit)` path (WebView, launcher, panel) that `swift test`
-      # on macOS does not. xcodebuild generates the package project in the
-      # runner's own compatible format — no XcodeGen version coupling.
-      - name: Build OpenCovenFeedback (iOS Simulator)
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate FeedbackApp project
+        run: xcodegen generate
+
+      - name: Build FeedbackApp (iOS Simulator)
         run: |
           xcodebuild build \
-            -scheme OpenCovenFeedback \
+            -scheme FeedbackApp \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
