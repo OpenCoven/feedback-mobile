@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "OpenCovenFeedback",
-    platforms: [.iOS(.v15)],
+    platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
         .library(name: "OpenCovenFeedback", targets: ["OpenCovenFeedback"]),
         .library(name: "FeedbackKit", targets: ["FeedbackKit"]),
