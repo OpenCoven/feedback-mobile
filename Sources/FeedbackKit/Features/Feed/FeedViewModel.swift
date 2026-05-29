@@ -7,10 +7,15 @@ public final class FeedViewModel: ObservableObject {
     @Published public private(set) var errorMessage: String?
 
     private let api: FeedbackAPI
+    private let cache: ContentCache
+    private let cacheKey = "feed"
     public var boardId: String?
     public var sort: PostSort = .newest
 
-    public init(api: FeedbackAPI) { self.api = api }
+    public init(api: FeedbackAPI, cache: ContentCache = ContentCache()) {
+        self.api = api
+        self.cache = cache
+    }
 
     public func load() async {
         isLoading = true
@@ -18,8 +23,15 @@ public final class FeedViewModel: ObservableObject {
         do {
             let page = try await api.listPosts(boardId: boardId, sort: sort, cursor: nil)
             posts = page.data
+            try? cache.save(posts, as: cacheKey)
         } catch {
-            errorMessage = Self.message(for: error)
+            if posts.isEmpty {
+                if let cached = try? cache.load(cacheKey, as: [PostSummary].self) {
+                    posts = cached
+                } else {
+                    errorMessage = Self.message(for: error)
+                }
+            }
         }
         isLoading = false
     }
