@@ -94,24 +94,26 @@ public final class HTTPFeedbackAPI: FeedbackAPI, @unchecked Sendable {
 
     // MARK: - Private helpers
 
-    private func request(path: String, method: String, query: [(String, String)]) -> URLRequest {
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
-        // appendingPathComponent may double-encode slashes; rebuild the path directly
-        components = URLComponents()
-        components.scheme = baseURL.scheme
-        components.host = baseURL.host
-        components.port = baseURL.port
-        components.path = path
-        if !query.isEmpty {
-            components.queryItems = query.map { URLQueryItem(name: $0.0, value: $0.1) }
-        }
-        var req = URLRequest(url: components.url!)
-        req.httpMethod = method
-        if let token = tokenProvider() {
-            req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        }
-        return req
+private func request(path: String, method: String, query: [(String, String)]) -> URLRequest {
+    var components = URLComponents()
+    components.scheme = baseURL.scheme
+    components.host = baseURL.host
+    components.port = baseURL.port
+
+    let basePath = baseURL.path == "/" ? "" : baseURL.path
+    components.path = basePath + path
+
+    if !query.isEmpty {
+        components.queryItems = query.map { URLQueryItem(name: $0.0, value: $0.1) }
     }
+
+    var req = URLRequest(url: components.url!)
+    req.httpMethod = method
+    if let token = tokenProvider() {
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+    }
+    return req
+}
 
     private func send<R: Decodable>(_ request: URLRequest) async throws -> R {
         let (data, response): (Data, URLResponse)
