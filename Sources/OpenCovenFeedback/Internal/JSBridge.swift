@@ -12,7 +12,9 @@ enum JSBridge {
     // MARK: - Inbound commands (host -> widget)
 
     static func localeCommand(_ locale: String) -> String {
-        "window.postMessage({type:'quackback:locale',data:'\(locale)'},'*');"
+        let data = try! JSONSerialization.data(withJSONObject: [locale], options: [])
+        let encoded = String(data: data, encoding: .utf8)!.dropFirst().dropLast()
+        return "window.postMessage({type:'quackback:locale',data:\(encoded)},'*');"
     }
 
     static func identifyCommand(ssoToken: String) -> String {
