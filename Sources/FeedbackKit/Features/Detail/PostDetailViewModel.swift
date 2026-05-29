@@ -31,10 +31,10 @@ public final class PostDetailViewModel: ObservableObject {
         isLoading = false
     }
 
-public func toggleVote() async {
-    needsSignIn = false
-    guard isSignedIn() else { needsSignIn = true; return }
-    do {
+    public func toggleVote() async {
+        needsSignIn = false
+        guard isSignedIn() else { needsSignIn = true; return }
+        do {
             let result = try await api.vote(postId: postId)
             if let current = post {
                 post = PostDetail(
@@ -55,10 +55,10 @@ public func toggleVote() async {
         }
     }
 
-public func addComment(_ text: String) async {
-    needsSignIn = false
-    guard isSignedIn() else { needsSignIn = true; return }
-    do {
+    public func addComment(_ text: String) async {
+        needsSignIn = false
+        guard isSignedIn() else { needsSignIn = true; return }
+        do {
             let comment = try await api.addComment(postId: postId, content: text, parentId: nil)
             comments.insert(comment, at: 0)
         } catch APIError.unauthorized {

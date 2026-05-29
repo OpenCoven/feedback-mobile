@@ -129,5 +129,9 @@ extension Color {
 }
 
 #Preview {
-    NavigationStack { HomeView() }
+    if #available(iOS 16.0, *) {
+        NavigationStack { HomeView() }
+    } else {
+        NavigationView { HomeView() }
+    }
 }

@@ -21,7 +21,7 @@ final class OpenCovenFeedbackWebView: NSObject, WKScriptMessageHandler, WKNaviga
         let wkConfig = WKWebViewConfiguration()
         let ucc = WKUserContentController()
         ucc.addUserScript(WKUserScript(source: JSBridge.bridgeScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
-        ucc.add(self, name: "opencoven-feedback")
+        ucc.add(self, name: "quackback")
         wkConfig.userContentController = ucc
         let wv = WKWebView(frame: .zero, configuration: wkConfig)
         wv.navigationDelegate = self; wv.isOpaque = false; wv.backgroundColor = .clear
@@ -35,16 +35,16 @@ final class OpenCovenFeedbackWebView: NSObject, WKScriptMessageHandler, WKNaviga
     }
 
     func tearDown() {
-        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "opencoven-feedback")
+        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "quackback")
         webView?.stopLoading(); webView = nil; isReady = false; pendingCommands.removeAll()
     }
 
     func userContentController(_ uc: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == "opencoven-feedback", let body = message.body as? String,
+        guard message.name == "quackback", let body = message.body as? String,
               let parsed = JSBridge.parseEvent(body) else { return }
         if parsed.event == .ready {
             isReady = true
-            webView?.evaluateJavaScript(JSBridge.initCommand(config: config))
+            // Theme/config arrive via config.json + URL params — there is no init message.
             if let l = config.locale { webView?.evaluateJavaScript(JSBridge.localeCommand(l)) }
             pendingCommands.forEach { webView?.evaluateJavaScript($0) }; pendingCommands.removeAll()
             delegate?.webViewDidBecomeReady(); return

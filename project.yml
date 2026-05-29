@@ -4,6 +4,7 @@ options:
   deploymentTarget:
     iOS: "15.0"
   xcodeVersion: "15"
+  projectFormat: xcode15_3
   generateEmptyDirectories: true
 
 packages:
@@ -95,6 +96,13 @@ targets:
         FEEDBACK_INSTANCE_URL: "http://localhost:3000"
 
 schemes:
+  FeedbackApp:
+    build:
+      targets:
+        FeedbackApp: all
+    run:
+      config: Debug
+
   FeedbackPortalApp:
     build:
       targets:

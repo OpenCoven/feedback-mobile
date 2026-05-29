@@ -21,15 +21,15 @@ public final class AuthStore: ObservableObject {
 
     public var token: String? { tokenStore.token }
 
-public func requestCode(email: String) async throws {
-    errorMessage = nil
-    do {
-        try await service.sendOTP(email: email)
-    } catch {
-        errorMessage = "Couldn't send a code. Please try again."
-        throw error
+    public func requestCode(email: String) async throws {
+        errorMessage = nil
+        do {
+            try await service.sendOTP(email: email)
+        } catch {
+            errorMessage = "Couldn't send a code. Please try again."
+            throw error
+        }
     }
-}
 
     public func verify(email: String, code: String) async {
         errorMessage = nil

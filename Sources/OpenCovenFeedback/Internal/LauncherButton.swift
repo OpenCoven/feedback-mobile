@@ -2,6 +2,10 @@
 import UIKit
 
 final class LauncherButton: UIButton {
+    /// Invoked on tap. Set by the owner; the `@objc` selector target lives here
+    /// (on a class) rather than on the `OpenCovenFeedback` enum namespace.
+    var onTap: (() -> Void)?
+
     private let position: OpenCovenFeedbackPosition
     private var isOpen = false
     private let size: CGFloat = 48
@@ -46,8 +50,12 @@ final class LauncherButton: UIButton {
                 icon.heightAnchor.constraint(equalToConstant: iconSize),
             ])
         }
+
+        addTarget(self, action: #selector(handleTap), for: .touchUpInside)
     }
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    @objc private func handleTap() { onTap?() }
 
     func install(in window: UIWindow) {
         window.addSubview(self)

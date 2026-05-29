@@ -18,6 +18,20 @@ final class SubmitViewModelTests: XCTestCase {
         XCTAssertFalse(ok)
         XCTAssertTrue(vm.needsSignIn)
     }
+
+    func testSubmitResetsNeedsSignInBeforeRepeatedSignedOutAttempts() async {
+        let vm = SubmitViewModel(api: MockFeedbackAPI(), isSignedIn: { false })
+        vm.boardId = "b1"; vm.title = "Bug"
+        let firstAttempt = await vm.submit()
+        XCTAssertFalse(firstAttempt)
+        XCTAssertTrue(vm.needsSignIn)
+        vm.needsSignIn = false
+
+        let secondAttempt = await vm.submit()
+
+        XCTAssertFalse(secondAttempt)
+        XCTAssertTrue(vm.needsSignIn)
+    }
     func testSubmitValidatesEmptyTitle() async {
         let vm = SubmitViewModel(api: MockFeedbackAPI(), isSignedIn: { true })
         vm.boardId = "b1"; vm.title = "  "

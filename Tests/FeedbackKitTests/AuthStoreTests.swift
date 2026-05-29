@@ -4,7 +4,11 @@ import XCTest
 final class StubAuthService: AuthService, @unchecked Sendable {
     var sentTo: String?
     var tokenToReturn = "session_tok"
-    func sendOTP(email: String) async throws { sentTo = email }
+    var sendError: Error?
+    func sendOTP(email: String) async throws {
+        if let sendError { throw sendError }
+        sentTo = email
+    }
     func verifyOTP(email: String, code: String) async throws -> String { tokenToReturn }
 }
 
@@ -27,5 +31,18 @@ final class AuthStoreTests: XCTestCase {
         auth.signOut()
         XCTAssertFalse(auth.isSignedIn)
         XCTAssertNil(store.token)
+    }
+
+    func testRequestCodeFailureSetsErrorMessageAndRethrows() async {
+        let service = StubAuthService()
+        service.sendError = APIError.transport("offline")
+        let auth = AuthStore(service: service, tokenStore: InMemoryTokenStore())
+
+        do {
+            try await auth.requestCode(email: "v@x.com")
+            XCTFail("Expected requestCode to throw")
+        } catch {
+            XCTAssertEqual(auth.errorMessage, "Couldn't send a code. Please try again.")
+        }
     }
 }

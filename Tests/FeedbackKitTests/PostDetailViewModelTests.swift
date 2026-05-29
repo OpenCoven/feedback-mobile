@@ -28,4 +28,28 @@ final class PostDetailViewModelTests: XCTestCase {
         await vm.toggleVote()
         XCTAssertTrue(vm.needsSignIn)
     }
+
+    func testVoteResetsNeedsSignInBeforeRepeatedSignedOutAttempts() async {
+        let vm = PostDetailViewModel(postId: "post_1", api: MockFeedbackAPI(), isSignedIn: { false })
+        await vm.load()
+        await vm.toggleVote()
+        XCTAssertTrue(vm.needsSignIn)
+        vm.needsSignIn = false
+
+        await vm.toggleVote()
+
+        XCTAssertTrue(vm.needsSignIn)
+    }
+
+    func testAddCommentResetsNeedsSignInBeforeRepeatedSignedOutAttempts() async {
+        let vm = PostDetailViewModel(postId: "post_1", api: MockFeedbackAPI(), isSignedIn: { false })
+        await vm.load()
+        await vm.addComment("hello")
+        XCTAssertTrue(vm.needsSignIn)
+        vm.needsSignIn = false
+
+        await vm.addComment("hello")
+
+        XCTAssertTrue(vm.needsSignIn)
+    }
 }
