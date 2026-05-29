@@ -1,6 +1,7 @@
 import Foundation
 
 /// A specific view the widget can open to, passed to `OpenCovenFeedback.open(view:...)`.
+/// Raw values match the canonical `quackback:open` contract.
 public enum OpenView: String, Sendable {
     /// Home — boards/feed list.
     case home = "home"
@@ -8,4 +9,6 @@ public enum OpenView: String, Sendable {
     case newPost = "new-post"
     /// Changelog feed.
     case changelog = "changelog"
+    /// Help center.
+    case help = "help"
 }

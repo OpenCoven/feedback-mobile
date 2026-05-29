@@ -4,6 +4,7 @@ options:
   deploymentTarget:
     iOS: "15.0"
   xcodeVersion: "15"
+  projectFormat: xcode15_3
   generateEmptyDirectories: true
 
 packages:
@@ -56,14 +57,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedback
         INFOPLIST_FILE: FeedbackApp/Sources/FeedbackApp/Info.plist
 
-  FeedbackAppTests:
-    type: bundle.unit-test
-    platform: iOS
-    deploymentTarget: "15.0"
-    sources:
-      - FeedbackApp/Tests
-    dependencies:
-      - target: FeedbackApp
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedback.tests
+schemes:
+  FeedbackApp:
+    build:
+      targets:
+        FeedbackApp: all
+    run:
+      config: Debug

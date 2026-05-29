@@ -5,8 +5,12 @@ struct RootView: View {
     @EnvironmentObject private var appConfig: AppConfiguration
 
     var body: some View {
-        NavigationStack {
-            HomeView()
+        Group {
+            if #available(iOS 16.0, *) {
+                NavigationStack { HomeView() }
+            } else {
+                NavigationView { HomeView() }
+            }
         }
         .onAppear {
             OpenCovenFeedback.showLauncher()

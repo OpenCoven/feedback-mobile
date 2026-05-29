@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test & Lint (SPM)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Swift toolchain
+        run: swift --version
+
+      - name: Run package tests
+        run: swift test
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: SwiftLint (strict)
+        run: swiftlint lint --strict --config .swiftlint.yml
+
+  ios-build:
+    name: Build SDK for iOS
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode
+        run: xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate FeedbackApp project
+        run: xcodegen generate
+
+      - name: Build FeedbackApp (iOS Simulator)
+        run: |
+          xcodebuild build \
+            -scheme FeedbackApp \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO

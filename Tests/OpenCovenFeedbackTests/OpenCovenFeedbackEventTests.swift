@@ -1,6 +1,23 @@
 @testable import OpenCovenFeedback
 import XCTest
 
+/// Thread-safe counter so it can be captured by the `@Sendable` event handler
+/// without mutating captured local state.
+private final class Counter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = 0
+    func increment() { lock.lock(); value += 1; lock.unlock() }
+    var count: Int { lock.lock(); defer { lock.unlock() }; return value }
+}
+
+/// Thread-safe ordered log of received events, for the same reason as `Counter`.
+private final class EventLog: @unchecked Sendable {
+    private let lock = NSLock()
+    private var events: [OpenCovenFeedbackEvent] = []
+    func append(_ event: OpenCovenFeedbackEvent) { lock.lock(); events.append(event); lock.unlock() }
+    var all: [OpenCovenFeedbackEvent] { lock.lock(); defer { lock.unlock() }; return events }
+}
+
 final class OpenCovenFeedbackEventTests: XCTestCase {
     func testAddAndFire() {
         let emitter = EventEmitter()
@@ -15,41 +32,41 @@ final class OpenCovenFeedbackEventTests: XCTestCase {
 
     func testRemove() {
         let emitter = EventEmitter()
-        var count = 0
-        let token = emitter.on(.submit) { _ in count += 1 }
-        emitter.emit(.submit, data: [:]); XCTAssertEqual(count, 1)
+        let counter = Counter()
+        let token = emitter.on(.postCreated) { _ in counter.increment() }
+        emitter.emit(.postCreated, data: [:]); XCTAssertEqual(counter.count, 1)
         emitter.off(token)
-        emitter.emit(.submit, data: [:]); XCTAssertEqual(count, 1)
+        emitter.emit(.postCreated, data: [:]); XCTAssertEqual(counter.count, 1)
     }
 
     func testRemoveAll() {
         let emitter = EventEmitter()
-        var count = 0
-        emitter.on(.vote) { _ in count += 1 }
-        emitter.on(.submit) { _ in count += 1 }
-        emitter.emit(.vote, data: [:]); emitter.emit(.submit, data: [:])
-        XCTAssertEqual(count, 2)
+        let counter = Counter()
+        emitter.on(.vote) { _ in counter.increment() }
+        emitter.on(.postCreated) { _ in counter.increment() }
+        emitter.emit(.vote, data: [:]); emitter.emit(.postCreated, data: [:])
+        XCTAssertEqual(counter.count, 2)
         emitter.removeAll()
-        emitter.emit(.vote, data: [:]); XCTAssertEqual(count, 2)
+        emitter.emit(.vote, data: [:]); XCTAssertEqual(counter.count, 2)
     }
 
     func testMultipleListenersSameEvent() {
         let emitter = EventEmitter()
-        var count1 = 0, count2 = 0
-        emitter.on(.vote) { _ in count1 += 1 }
-        emitter.on(.vote) { _ in count2 += 1 }
+        let first = Counter(), second = Counter()
+        emitter.on(.vote) { _ in first.increment() }
+        emitter.on(.vote) { _ in second.increment() }
         emitter.emit(.vote, data: [:])
-        XCTAssertEqual(count1, 1)
-        XCTAssertEqual(count2, 1)
+        XCTAssertEqual(first.count, 1)
+        XCTAssertEqual(second.count, 1)
     }
 
     func testOffWithNonExistentToken() {
         let emitter = EventEmitter()
-        var count = 0
-        emitter.on(.vote) { _ in count += 1 }
+        let counter = Counter()
+        emitter.on(.vote) { _ in counter.increment() }
         emitter.off(EventToken()) // non-existent token
         emitter.emit(.vote, data: [:])
-        XCTAssertEqual(count, 1) // listener still fires
+        XCTAssertEqual(counter.count, 1) // listener still fires
     }
 
     func testEmitWithNoListeners() {
@@ -60,30 +77,39 @@ final class OpenCovenFeedbackEventTests: XCTestCase {
 
     func testRemoveOnlyTargetListener() {
         let emitter = EventEmitter()
-        var count1 = 0, count2 = 0
-        emitter.on(.vote) { _ in count1 += 1 }
-        let token2 = emitter.on(.vote) { _ in count2 += 1 }
+        let first = Counter(), second = Counter()
+        emitter.on(.vote) { _ in first.increment() }
+        let token2 = emitter.on(.vote) { _ in second.increment() }
         emitter.off(token2)
         emitter.emit(.vote, data: [:])
-        XCTAssertEqual(count1, 1)
-        XCTAssertEqual(count2, 0)
+        XCTAssertEqual(first.count, 1)
+        XCTAssertEqual(second.count, 0)
     }
 
     func testAllEventTypes() {
         let emitter = EventEmitter()
-        var received: [OpenCovenFeedbackEvent] = []
-        for event in [OpenCovenFeedbackEvent.ready, .vote, .submit, .close, .navigate] {
-            emitter.on(event) { _ in received.append(event) }
+        let log = EventLog()
+        let all: [OpenCovenFeedbackEvent] = [
+            .ready, .open, .close, .postCreated, .vote, .commentCreated,
+            .identify, .navigate, .identifyResult, .authChange,
+        ]
+        for event in all {
+            emitter.on(event) { _ in log.append(event) }
             emitter.emit(event, data: [:])
         }
-        XCTAssertEqual(received, [.ready, .vote, .submit, .close, .navigate])
+        XCTAssertEqual(log.all, all)
     }
 
-    func testEventRawValues() {
+    func testEventRawValuesMatchContract() {
         XCTAssertEqual(OpenCovenFeedbackEvent.ready.rawValue, "ready")
-        XCTAssertEqual(OpenCovenFeedbackEvent.vote.rawValue, "vote")
-        XCTAssertEqual(OpenCovenFeedbackEvent.submit.rawValue, "submit")
+        XCTAssertEqual(OpenCovenFeedbackEvent.open.rawValue, "open")
         XCTAssertEqual(OpenCovenFeedbackEvent.close.rawValue, "close")
+        XCTAssertEqual(OpenCovenFeedbackEvent.postCreated.rawValue, "post:created")
+        XCTAssertEqual(OpenCovenFeedbackEvent.vote.rawValue, "vote")
+        XCTAssertEqual(OpenCovenFeedbackEvent.commentCreated.rawValue, "comment:created")
+        XCTAssertEqual(OpenCovenFeedbackEvent.identify.rawValue, "identify")
         XCTAssertEqual(OpenCovenFeedbackEvent.navigate.rawValue, "navigate")
+        XCTAssertEqual(OpenCovenFeedbackEvent.identifyResult.rawValue, "identify-result")
+        XCTAssertEqual(OpenCovenFeedbackEvent.authChange.rawValue, "auth-change")
     }
 }
