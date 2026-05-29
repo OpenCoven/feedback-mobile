@@ -89,7 +89,10 @@ final class OpenCovenFeedbackEventTests: XCTestCase {
     func testAllEventTypes() {
         let emitter = EventEmitter()
         let log = EventLog()
-        let all: [OpenCovenFeedbackEvent] = [.ready, .open, .close, .postCreated, .vote, .commentCreated, .identify, .navigate, .identifyResult, .authChange]
+        let all: [OpenCovenFeedbackEvent] = [
+            .ready, .open, .close, .postCreated, .vote, .commentCreated,
+            .identify, .navigate, .identifyResult, .authChange,
+        ]
         for event in all {
             emitter.on(event) { _ in log.append(event) }
             emitter.emit(event, data: [:])

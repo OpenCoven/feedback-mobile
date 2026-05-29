@@ -43,8 +43,9 @@ public enum OpenCovenFeedback {
         ensureWV(config)
         wvManager?.execute(JSBridge.openCommand(view: view, title: title, board: board))
         presentPanel()
+        emitOpen(view: view, title: title, board: board)
     }
-    public static func close() { dismissPanel() }
+    public static func close() { dismissPanel(emitClose: true) }
 
     public static func showLauncher() {
         guard let config, launcher == nil else { return }
@@ -62,7 +63,7 @@ public enum OpenCovenFeedback {
     public static func off(_ token: EventToken) { emitter.off(token) }
 
     public static func destroy() {
-        dismissPanel(); hideLauncher(); wvManager?.tearDown(); wvManager = nil
+        dismissPanel(emitClose: false); hideLauncher(); wvManager?.tearDown(); wvManager = nil
         emitter.removeAll(); config = nil; pendingIdentify = nil; serverThemeColor = nil
     }
 
@@ -104,8 +105,17 @@ public enum OpenCovenFeedback {
         guard let top = topVC else { return }
         top.present(pc, animated: true); isShowing = true; launcher?.setOpen(true); panel = pc
     }
-    private static func dismissPanel() {
+    private static func dismissPanel(emitClose: Bool = false) {
+        let shouldEmit = emitClose && isShowing
         panel?.dismiss(animated: true); panel = nil; isShowing = false; launcher?.setOpen(false)
+        if shouldEmit { emitter.emit(.close, data: [:]) }
+    }
+    private static func emitOpen(view: OpenView?, title: String?, board: String?) {
+        var data: [String: Any] = [:]
+        if let view { data["view"] = view.rawValue }
+        if let title { data["title"] = title }
+        if let board { data["board"] = board }
+        emitter.emit(.open, data: data)
     }
     private static func launcherToggle() { if isShowing { close() } else { open() } }
 
@@ -124,7 +134,7 @@ public enum OpenCovenFeedback {
     private final class Delegate: OpenCovenFeedbackWebViewDelegate {
         static let shared = Delegate()
         func webViewDidReceiveEvent(_ event: OpenCovenFeedbackEvent, data: [String: Any]) {
-            if event == .close { dismissPanel() }; emitter.emit(event, data: data)
+            if event == .close { dismissPanel(emitClose: false) }; emitter.emit(event, data: data)
         }
         func webViewDidBecomeReady() {
             if let js = pendingIdentify { wvManager?.execute(js); pendingIdentify = nil }

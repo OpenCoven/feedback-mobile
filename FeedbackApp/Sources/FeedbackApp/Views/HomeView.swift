@@ -63,8 +63,7 @@ struct HomeView: View {
                 icon: "newspaper.fill",
                 color: .secondary
             ) {
-                // Changelog is a tab inside the widget — open the widget to reach it.
-                OpenCovenFeedback.open()
+                OpenCovenFeedback.open(view: .changelog)
             }
         }
     }
@@ -130,5 +129,9 @@ extension Color {
 }
 
 #Preview {
-    NavigationStack { HomeView() }
+    if #available(iOS 16.0, *) {
+        NavigationStack { HomeView() }
+    } else {
+        NavigationView { HomeView() }
+    }
 }

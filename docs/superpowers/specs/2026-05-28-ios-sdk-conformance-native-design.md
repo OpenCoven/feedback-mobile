@@ -61,7 +61,7 @@ wire protocol stays `quackback:`-namespaced even though the product is rebranded
 - `quackback:identify` — `{ anonymous: true } | { id, email, name?, avatarURL? } | { ssoToken } | null`
 - `quackback:metadata` — `Record<string, string>` (null value on a key = delete)
 - `quackback:locale` — `string`
-- `quackback:open` — `{ view?: 'home' | 'new-post', title?, board? } | undefined`
+- `quackback:open` — `{ view?: 'home' | 'new-post' | 'changelog' | 'help', title?, board? } | undefined`
 - There is **no** `init` message. Theme/config is delivered via `config.json`
   and URL params, not a postMessage.
 
@@ -109,7 +109,7 @@ wire protocol stays `quackback:`-namespaced even though the product is rebranded
 | Native global | `window.__quackbackNative` | `window.__opencoven-feedbackNative` (invalid JS) | restore + fix JS |
 | Bridge JS validity | callable `dispatch` | hyphen → SyntaxError | rewrite with valid identifiers / bracket access |
 | `init` command | none | SDK sends theme via `init` | remove |
-| `open` views | `home`, `new-post` | adds `changelog` | drop `changelog` as a view; gate tabs |
+| `open` views | `home`, `new-post`, `changelog`, `help` | `home`, `new-post`, `changelog`, `help` | preserve parity |
 | Events | ready, open, close, post:created, vote, comment:created, identify | ready, vote, submit, close, navigate | re-map to contract |
 | `submit` | `post:created` | `submit` | rename/map |
 | `navigate` | outbound `{ url }` | treated as `event` | parse as message, typed `{ url }` |
@@ -177,8 +177,8 @@ regressions.
    `open`, `identify`, `comment:created`. Fix the `.open` compile error in
    `FeedbackApp/.../AppConfiguration.swift` and `README.md` by introducing the
    real `open` event.
-5. **OpenView**: constrain to `home` / `new-post`; update `HomeView.swift`'s
-   `.changelog` open call (changelog is reached as a tab, not an open-view).
+5. **OpenView**: keep the SDK enum aligned with `OpenOptions` (`home`,
+   `new-post`, `changelog`, `help`) so native callers do not lose web parity.
 6. **Contract tests**: execute the bridge JS in JavaScriptCore to prove
    `window.__quackbackNative.dispatch` is defined and callable, and that built
    command strings parse to the expected `quackback:` shapes. Add a

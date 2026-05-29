@@ -66,6 +66,11 @@ final class JSBridgeTests: XCTestCase {
         XCTAssertTrue(js.contains("\"title\":\"Crash\""))
     }
 
+    func testOpenChangelogAndHelpViews() {
+        XCTAssertTrue(JSBridge.openCommand(view: .changelog).contains("\"view\":\"changelog\""))
+        XCTAssertTrue(JSBridge.openCommand(view: .help).contains("\"view\":\"help\""))
+    }
+
     func testOpenEmpty() {
         XCTAssertEqual(JSBridge.openCommand(), "window.postMessage({type:'quackback:open'},'*');")
     }
