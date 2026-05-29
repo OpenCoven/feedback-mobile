@@ -94,18 +94,6 @@ targets:
         INFOPLIST_FILE: App/FeedbackPortalApp/Info.plist
         FEEDBACK_INSTANCE_URL: "http://localhost:3000"
 
-  FeedbackAppTests:
-    type: bundle.unit-test
-    platform: iOS
-    deploymentTarget: "15.0"
-    sources:
-      - FeedbackApp/Tests
-    dependencies:
-      - target: FeedbackApp
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedback.tests
-
 schemes:
   FeedbackPortalApp:
     build:

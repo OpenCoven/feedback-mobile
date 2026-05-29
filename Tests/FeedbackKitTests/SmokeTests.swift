@@ -1,5 +1,5 @@
-import XCTest
 @testable import FeedbackKit
+import XCTest
 
 final class SmokeTests: XCTestCase {
     func testModuleLoads() {

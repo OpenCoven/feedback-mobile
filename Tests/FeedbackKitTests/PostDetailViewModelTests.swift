@@ -1,5 +1,5 @@
-import XCTest
 @testable import FeedbackKit
+import XCTest
 
 @MainActor
 final class PostDetailViewModelTests: XCTestCase {

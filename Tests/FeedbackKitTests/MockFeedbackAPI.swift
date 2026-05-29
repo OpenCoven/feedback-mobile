@@ -1,7 +1,20 @@
-import Foundation
 @testable import FeedbackKit
+import Foundation
 
 // MARK: - MockFeedbackAPI
+
+struct SubmittedPost {
+    var boardId: String
+    var title: String
+    var content: String
+}
+
+struct AddedComment {
+    var postId: String
+    var content: String
+    var parentId: String?
+}
+
 // Non-final so subclasses can override individual methods to inject failures.
 class MockFeedbackAPI: @unchecked Sendable, FeedbackAPI {
 
@@ -37,9 +50,9 @@ class MockFeedbackAPI: @unchecked Sendable, FeedbackAPI {
 
     // MARK: Recorded inputs
 
-    var submitted: (boardId: String, title: String, content: String)?
+    var submitted: SubmittedPost?
     var votedPostId: String?
-    var addedComment: (postId: String, content: String, parentId: String?)?
+    var addedComment: AddedComment?
 
     // MARK: FeedbackAPI conformance
 
@@ -73,7 +86,7 @@ class MockFeedbackAPI: @unchecked Sendable, FeedbackAPI {
 
     func submitPost(boardId: String, title: String, content: String) async throws -> PostSummary {
         if shouldUnauthorize { throw APIError.unauthorized }
-        submitted = (boardId: boardId, title: title, content: content)
+        submitted = SubmittedPost(boardId: boardId, title: title, content: content)
         let post = PostSummary(
             id: "post_new",
             title: title,
@@ -94,7 +107,7 @@ class MockFeedbackAPI: @unchecked Sendable, FeedbackAPI {
 
     func addComment(postId: String, content: String, parentId: String?) async throws -> Comment {
         if shouldUnauthorize { throw APIError.unauthorized }
-        addedComment = (postId: postId, content: content, parentId: parentId)
+        addedComment = AddedComment(postId: postId, content: content, parentId: parentId)
         return Comment(
             id: "comment_new",
             content: content,

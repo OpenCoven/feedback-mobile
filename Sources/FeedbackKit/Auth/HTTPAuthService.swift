@@ -15,8 +15,8 @@ public final class HTTPAuthService: AuthService, @unchecked Sendable {
 
     public func verifyOTP(email: String, code: String) async throws -> String {
         let data = try await post("/api/auth/sign-in/email-otp", body: ["email": email, "otp": code])
-        struct R: Decodable { let token: String }
-        guard let token = try? JSONDecoder().decode(R.self, from: data).token else {
+        struct SignInResponse: Decodable { let token: String }
+        guard let token = try? JSONDecoder().decode(SignInResponse.self, from: data).token else {
             throw APIError.decoding("No token in sign-in response")
         }
         return token
