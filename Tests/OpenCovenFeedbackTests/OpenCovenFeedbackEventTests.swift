@@ -10,7 +10,7 @@ private final class Counter: @unchecked Sendable {
 private final class EventLog: @unchecked Sendable {
     private let lock = NSLock()
     private var events: [OpenCovenFeedbackEvent] = []
-    func append(_ e: OpenCovenFeedbackEvent) { lock.lock(); events.append(e); lock.unlock() }
+    func append(_ event: OpenCovenFeedbackEvent) { lock.lock(); events.append(event); lock.unlock() }
     var all: [OpenCovenFeedbackEvent] { lock.lock(); defer { lock.unlock() }; return events }
 }
 
