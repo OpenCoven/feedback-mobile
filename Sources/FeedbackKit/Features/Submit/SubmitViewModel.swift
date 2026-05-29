@@ -16,11 +16,14 @@ public final class SubmitViewModel: ObservableObject {
         self.api = api; self.isSignedIn = isSignedIn
     }
 
-    @discardableResult
-    public func submit() async -> Bool {
-        errorMessage = nil
-        guard isSignedIn() else { needsSignIn = true; return false }
-        guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+@discardableResult
+public func submit() async -> Bool {
+    needsSignIn = false
+    errorMessage = nil
+    guard isSignedIn() else { needsSignIn = true; return false }
+    guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        errorMessage = "Title is required."; return false
+    }
             errorMessage = "Title is required."; return false
         }
         guard !boardId.isEmpty else { errorMessage = "Pick a board."; return false }
