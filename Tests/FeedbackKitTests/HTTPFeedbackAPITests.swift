@@ -43,4 +43,20 @@ final class HTTPFeedbackAPITests: XCTestCase {
             XCTAssertEqual(error as? APIError, .unauthorized)
         }
     }
+
+    // A baseURL with a path prefix (e.g. https://host/feedback) must be preserved
+    // when building request URLs, not dropped — guards the request(path:) path-join.
+    func testListPostsPreservesBaseURLPathPrefix() async throws {
+        let cfg = URLSessionConfiguration.ephemeral
+        cfg.protocolClasses = [StubURLProtocol.self]
+        let session = URLSession(configuration: cfg)
+        let api = HTTPFeedbackAPI(baseURL: URL(string: "https://fb.example.com/feedback")!,
+                                  session: session, tokenProvider: { nil })
+        StubURLProtocol.handler = { req in
+            XCTAssertEqual(req.url?.path, "/feedback/api/public/v1/posts")
+            let body = #"{"data":[],"meta":{"pagination":{"cursor":null,"hasMore":false}}}"#
+            return (HTTPURLResponse(url: req.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(body.utf8))
+        }
+        _ = try await api.listPosts(boardId: nil, sort: .newest, cursor: nil)
+    }
 }
