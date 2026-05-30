@@ -50,22 +50,26 @@ private struct ChangelogListView: View {
                 .listRowSeparator(.hidden)
             } else {
                 ForEach(vm.entries) { entry in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(entry.title)
-                            .font(.headline)
-                        if let publishedAt = entry.publishedAt {
-                            Text(publishedAt, style: .date)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                    NavigationLink {
+                        ChangelogDetailView(entry: entry)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(entry.title)
+                                .font(.headline)
+                            if let publishedAt = entry.publishedAt {
+                                Text(publishedAt, style: .date)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if let content = entry.content, !content.isEmpty {
+                                Text(content)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(3)
+                            }
                         }
-                        if let content = entry.content, !content.isEmpty {
-                            Text(content)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(3)
-                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
             }
         }
@@ -73,5 +77,31 @@ private struct ChangelogListView: View {
         .refreshable {
             await vm.load()
         }
+    }
+}
+
+private struct ChangelogDetailView: View {
+    let entry: ChangelogEntry
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(entry.title)
+                    .font(.title2.bold())
+                if let publishedAt = entry.publishedAt {
+                    Text(publishedAt, style: .date)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                if let content = entry.content, !content.isEmpty {
+                    Text(content)
+                        .font(.body)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+        }
+        .navigationTitle("Update")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
