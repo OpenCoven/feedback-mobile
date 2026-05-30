@@ -89,11 +89,13 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
+    configFiles:
+      Debug: FeedbackApp/Base.xcconfig
+      Release: FeedbackApp/Base.xcconfig
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.opencoven.feedbackportal
         INFOPLIST_FILE: App/FeedbackPortalApp/Info.plist
-        FEEDBACK_INSTANCE_URL: "https://feedback.opencoven.ai"
 
 schemes:
   FeedbackApp:

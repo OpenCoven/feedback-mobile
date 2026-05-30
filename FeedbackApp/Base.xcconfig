@@ -1,0 +1,11 @@
+// Base build config for the FeedbackPortalApp target (committed; wired via
+// configFiles in project.yml). This file is intentionally tracked so xcodegen
+// always has a valid config path.
+//
+// FEEDBACK_INSTANCE_URL is deliberately left unset here, so the app defaults to
+// http://localhost:3000 for local development (see AppEnvironment).
+//
+// To point the app at a live instance, copy FeedbackApp.xcconfig.template to
+// FeedbackApp.xcconfig (gitignored) and set FEEDBACK_INSTANCE_URL there — the
+// optional include below picks it up when present.
+#include? "FeedbackApp.xcconfig"

@@ -3,7 +3,15 @@
 // Copy this file to FeedbackApp.xcconfig (gitignored) and fill in your values.
 // NEVER commit the real .xcconfig — only commit this .template file.
 //
-// In Xcode: Project > Info > Configurations, point each config to FeedbackApp.xcconfig
+// This drives the FeedbackPortalApp target via FeedbackApp/Base.xcconfig
+// (#include?'d when present). Without it, the app defaults to
+// http://localhost:3000 for local development. Create the .xcconfig only when
+// you want to point the app at a live instance.
+//
+// IMPORTANT: xcconfig treats "//" as the start of a comment, so the "//" in a
+// URL must be escaped with an empty "$()" expansion. Write the value exactly
+// like the example below (keep the "/$()/").
 
-// Your deployed OpenCoven Feedback instance URL (no trailing slash)
-FEEDBACK_INSTANCE_URL = https://feedback.yourapp.com
+// Your deployed OpenCoven Feedback instance URL (no trailing slash).
+// e.g. https://feedback.opencoven.ai  ->  https:/$()/feedback.opencoven.ai
+FEEDBACK_INSTANCE_URL = https:/$()/feedback.yourapp.com

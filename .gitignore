@@ -9,6 +9,7 @@ DerivedData/
 FeedbackApp/FeedbackApp.xcconfig
 *.xcconfig
 !*.xcconfig.template
+!FeedbackApp/Base.xcconfig
 
 .env
 .env.*
